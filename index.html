@@ -1,0 +1,4222 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RH System - Gestão de Recursos Humanos</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #667eea;
+            --primary-dark: #5a67d8;
+            --primary-light: #7c8df1;
+            --secondary: #764ba2;
+            --success: #48bb78;
+            --warning: #ed8936;
+            --danger: #f56565;
+            --info: #4299e1;
+            --bg-primary: #ffffff;
+            --bg-secondary: #f7fafc;
+            --bg-tertiary: #edf2f7;
+            --text-primary: #2d3748;
+            --text-secondary: #4a5568;
+            --text-tertiary: #718096;
+            --border: #e2e8f0;
+            --shadow-sm: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.08);
+            --shadow-md: 0 4px 6px rgba(0,0,0,0.1), 0 2px 4px rgba(0,0,0,0.06);
+            --shadow-lg: 0 10px 15px rgba(0,0,0,0.1), 0 4px 6px rgba(0,0,0,0.05);
+            --shadow-xl: 0 20px 25px rgba(0,0,0,0.15), 0 10px 10px rgba(0,0,0,0.04);
+            --radius-sm: 6px;
+            --radius-md: 8px;
+            --radius-lg: 12px;
+            --radius-xl: 16px;
+            --transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        .app-container {
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* SIDEBAR COM UX MELHORADA */
+        .sidebar {
+            width: 280px;
+            background: linear-gradient(180deg, var(--primary) 0%, var(--secondary) 100%);
+            color: white;
+            display: flex;
+            flex-direction: column;
+            box-shadow: var(--shadow-lg);
+            position: relative;
+            z-index: 100;
+            transition: var(--transition);
+        }
+
+        .sidebar.collapsed {
+            width: 80px;
+        }
+
+        .logo {
+            padding: 24px 20px;
+            font-size: 22px;
+            font-weight: 700;
+            border-bottom: 1px solid rgba(255,255,255,0.15);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            position: relative;
+        }
+
+        .logo-content {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            overflow: hidden;
+        }
+
+        .logo-icon {
+            font-size: 28px;
+            flex-shrink: 0;
+        }
+
+        .logo-text {
+            transition: var(--transition);
+            white-space: nowrap;
+        }
+
+        .sidebar.collapsed .logo-text {
+            opacity: 0;
+            width: 0;
+        }
+
+        .sidebar-toggle {
+            background: rgba(255,255,255,0.2);
+            border: none;
+            color: white;
+            width: 32px;
+            height: 32px;
+            border-radius: var(--radius-md);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: var(--transition);
+            flex-shrink: 0;
+        }
+
+        .sidebar-toggle:hover {
+            background: rgba(255,255,255,0.3);
+            transform: scale(1.05);
+        }
+
+        .nav-menu {
+            flex: 1;
+            padding: 16px 0;
+            overflow-y: auto;
+            overflow-x: hidden;
+        }
+
+        .nav-menu::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .nav-menu::-webkit-scrollbar-track {
+            background: rgba(255,255,255,0.1);
+        }
+
+        .nav-menu::-webkit-scrollbar-thumb {
+            background: rgba(255,255,255,0.3);
+            border-radius: 3px;
+        }
+
+        .nav-section {
+            margin-bottom: 24px;
+        }
+
+        .nav-section-title {
+            padding: 8px 20px;
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: rgba(255,255,255,0.6);
+            transition: var(--transition);
+        }
+
+        .sidebar.collapsed .nav-section-title {
+            opacity: 0;
+            height: 0;
+            padding: 0;
+            margin: 0;
+        }
+
+        .nav-item {
+            padding: 12px 20px;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 15px;
+            border-left: 3px solid transparent;
+            position: relative;
+            margin: 2px 0;
+        }
+
+        .nav-item:hover {
+            background: rgba(255,255,255,0.15);
+            border-left-color: white;
+        }
+
+        .nav-item.active {
+            background: rgba(255,255,255,0.25);
+            border-left-color: white;
+            font-weight: 600;
+        }
+
+        .nav-item.active::after {
+            content: '';
+            position: absolute;
+            right: 20px;
+            width: 6px;
+            height: 6px;
+            background: white;
+            border-radius: 50%;
+        }
+
+        .nav-icon {
+            font-size: 20px;
+            width: 24px;
+            text-align: center;
+            flex-shrink: 0;
+        }
+
+        .nav-text {
+            transition: var(--transition);
+            white-space: nowrap;
+            overflow: hidden;
+        }
+
+        .sidebar.collapsed .nav-text {
+            opacity: 0;
+            width: 0;
+        }
+
+        .nav-badge {
+            background: var(--danger);
+            color: white;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 700;
+            margin-left: auto;
+            transition: var(--transition);
+        }
+
+        .sidebar.collapsed .nav-badge {
+            opacity: 0;
+            width: 0;
+        }
+
+        /* HEADER MELHORADO */
+        .header {
+            background: var(--bg-primary);
+            padding: 20px 32px;
+            box-shadow: var(--shadow-sm);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 24px;
+            flex-wrap: wrap;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            flex: 1;
+            min-width: 200px;
+        }
+
+        .header-title {
+            font-size: 28px;
+            font-weight: 700;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .header-breadcrumb {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+            color: var(--text-tertiary);
+            margin-top: 4px;
+        }
+
+        .breadcrumb-separator {
+            color: var(--border);
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: var(--radius-md);
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            white-space: nowrap;
+            text-decoration: none;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.3);
+            transform: translate(-50%, -50%);
+            transition: width 0.6s, height 0.6s;
+        }
+
+        .btn:hover::before {
+            width: 300px;
+            height: 300px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: white;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .btn-primary:active {
+            transform: translateY(0);
+        }
+
+        .btn-secondary {
+            background: var(--bg-tertiary);
+            color: var(--text-secondary);
+        }
+
+        .btn-secondary:hover {
+            background: var(--border);
+        }
+
+        .btn-outline {
+            background: transparent;
+            border: 2px solid var(--border);
+            color: var(--text-secondary);
+        }
+
+        .btn-outline:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+            background: rgba(102, 126, 234, 0.05);
+        }
+
+        .btn-success {
+            background: var(--success);
+            color: white;
+        }
+
+        .btn-danger {
+            background: var(--danger);
+            color: white;
+        }
+
+        .btn-sm {
+            padding: 6px 14px;
+            font-size: 13px;
+        }
+
+        .btn-lg {
+            padding: 14px 28px;
+            font-size: 16px;
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        /* CONTENT AREA */
+        .content-area {
+            flex: 1;
+            padding: 32px;
+            overflow-y: auto;
+            background: var(--bg-secondary);
+        }
+
+        .content-area::-webkit-scrollbar {
+            width: 10px;
+        }
+
+        .content-area::-webkit-scrollbar-track {
+            background: var(--bg-tertiary);
+        }
+
+        .content-area::-webkit-scrollbar-thumb {
+            background: var(--border);
+            border-radius: 5px;
+        }
+
+        .content-area::-webkit-scrollbar-thumb:hover {
+            background: var(--text-tertiary);
+        }
+
+        .page {
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .page.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* CARDS ESTATÍSTICOS MELHORADOS */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 24px;
+            margin-bottom: 32px;
+        }
+
+        .stat-card {
+            background: var(--bg-primary);
+            padding: 24px;
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-sm);
+            transition: var(--transition);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            opacity: 0;
+            transition: var(--transition);
+        }
+
+        .stat-card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .stat-card:hover::before {
+            opacity: 1;
+        }
+
+        .stat-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 16px;
+        }
+
+        .stat-card-icon {
+            width: 56px;
+            height: 56px;
+            border-radius: var(--radius-lg);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .stat-card-label {
+            font-size: 13px;
+            color: var(--text-tertiary);
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 8px;
+        }
+
+        .stat-card-value {
+            font-size: 36px;
+            font-weight: 800;
+            color: var(--text-primary);
+            line-height: 1;
+        }
+
+        .stat-card-trend {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            margin-top: 12px;
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        .trend-up {
+            color: var(--success);
+        }
+
+        .trend-down {
+            color: var(--danger);
+        }
+
+        /* TABELAS MELHORADAS */
+        .table-container {
+            background: var(--bg-primary);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-sm);
+            overflow: hidden;
+        }
+
+        .table-header {
+            padding: 24px 28px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 16px;
+        }
+
+        .table-title {
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .table-filters {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .search-box {
+            padding: 10px 16px;
+            border: 2px solid var(--border);
+            border-radius: var(--radius-md);
+            font-size: 14px;
+            width: 300px;
+            transition: var(--transition);
+            background: var(--bg-secondary);
+        }
+
+        .search-box:focus {
+            outline: none;
+            border-color: var(--primary);
+            background: var(--bg-primary);
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .filter-select {
+            padding: 10px 16px;
+            border: 2px solid var(--border);
+            border-radius: var(--radius-md);
+            font-size: 14px;
+            background: var(--bg-secondary);
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .filter-select:focus {
+            outline: none;
+            border-color: var(--primary);
+            background: var(--bg-primary);
+        }
+
+        .table-wrapper {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        thead {
+            background: var(--bg-secondary);
+        }
+
+        th {
+            padding: 16px 24px;
+            text-align: left;
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            white-space: nowrap;
+        }
+
+        th.sortable {
+            cursor: pointer;
+            user-select: none;
+        }
+
+        th.sortable:hover {
+            color: var(--primary);
+        }
+
+        td {
+            padding: 18px 24px;
+            border-top: 1px solid var(--border);
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+
+        tr {
+            transition: var(--transition);
+        }
+
+        tbody tr:hover {
+            background: var(--bg-secondary);
+        }
+
+        .table-empty {
+            text-align: center;
+            padding: 60px 20px;
+            color: var(--text-tertiary);
+        }
+
+        .table-empty-icon {
+            font-size: 48px;
+            margin-bottom: 16px;
+            opacity: 0.5;
+        }
+
+        .table-empty-text {
+            font-size: 16px;
+            margin-bottom: 8px;
+        }
+
+        .table-empty-subtext {
+            font-size: 14px;
+            color: var(--text-tertiary);
+        }
+
+        /* BADGES MELHORADOS */
+        .badge {
+            padding: 5px 12px;
+            border-radius: 16px;
+            font-size: 12px;
+            font-weight: 700;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            white-space: nowrap;
+        }
+
+        .badge-active {
+            background: #d4f4dd;
+            color: #1a5f3b;
+        }
+
+        .badge-inactive, .badge-desligado {
+            background: #fee;
+            color: #991b1b;
+        }
+
+        .badge-pending, .badge-férias, .badge-afastado {
+            background: #fef3c7;
+            color: #78350f;
+        }
+
+        .badge-vacation {
+            background: #dbeafe;
+            color: #1e3a8a;
+        }
+
+        .badge-success {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .badge-info {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+
+        .badge-warning {
+            background: #fed7aa;
+            color: #7c2d12;
+        }
+
+        /* BOTÕES DE AÇÃO NA TABELA */
+        .action-buttons {
+            display: flex;
+            gap: 8px;
+        }
+
+        .action-btn {
+            padding: 6px 12px;
+            border: none;
+            border-radius: var(--radius-sm);
+            font-size: 12px;
+            cursor: pointer;
+            transition: var(--transition);
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .action-btn:hover {
+            transform: scale(1.05);
+        }
+
+        .action-btn-view {
+            background: #e0f2fe;
+            color: #0c4a6e;
+        }
+
+        .action-btn-edit {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+
+        .action-btn-delete {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        /* MODAIS MELHORADOS */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.6);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+            overflow-y: auto;
+            padding: 20px;
+            backdrop-filter: blur(4px);
+        }
+
+        .modal.active {
+            display: flex;
+            animation: modalFadeIn 0.3s ease;
+        }
+
+        @keyframes modalFadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+
+        .modal-content {
+            background: var(--bg-primary);
+            padding: 0;
+            border-radius: var(--radius-xl);
+            max-width: 800px;
+            width: 100%;
+            max-height: 90vh;
+            overflow: hidden;
+            box-shadow: var(--shadow-xl);
+            animation: modalSlideUp 0.3s ease;
+            display: flex;
+            flex-direction: column;
+        }
+
+        @keyframes modalSlideUp {
+            from {
+                transform: translateY(50px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .modal-header {
+            padding: 28px 32px;
+            border-bottom: 2px solid var(--border);
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.05), rgba(118, 75, 162, 0.05));
+        }
+
+        .modal-title {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .modal-subtitle {
+            font-size: 14px;
+            color: var(--text-tertiary);
+            margin-top: 8px;
+        }
+
+        .modal-body {
+            padding: 32px;
+            overflow-y: auto;
+            flex: 1;
+        }
+
+        .modal-body::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .modal-body::-webkit-scrollbar-track {
+            background: var(--bg-secondary);
+        }
+
+        .modal-body::-webkit-scrollbar-thumb {
+            background: var(--border);
+            border-radius: 4px;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 24px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-group.full-width {
+            grid-column: 1 / -1;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: var(--text-primary);
+            font-size: 14px;
+        }
+
+        .form-group label .required {
+            color: var(--danger);
+            margin-left: 4px;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid var(--border);
+            border-radius: var(--radius-md);
+            font-size: 14px;
+            font-family: inherit;
+            transition: var(--transition);
+            background: var(--bg-secondary);
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+            background: var(--bg-primary);
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        .form-help {
+            font-size: 12px;
+            color: var(--text-tertiary);
+            margin-top: 6px;
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 12px;
+            justify-content: flex-end;
+            padding: 24px 32px;
+            border-top: 2px solid var(--border);
+            background: var(--bg-secondary);
+        }
+
+        /* KANBAN BOARD MELHORADO */
+        .kanban-board {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 24px;
+            padding-bottom: 20px;
+        }
+
+        .kanban-column {
+            background: var(--bg-primary);
+            border-radius: var(--radius-lg);
+            padding: 20px;
+            box-shadow: var(--shadow-sm);
+            max-height: calc(100vh - 250px);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .kanban-header {
+            font-size: 16px;
+            font-weight: 700;
+            margin-bottom: 16px;
+            padding-bottom: 16px;
+            border-bottom: 2px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .kanban-count {
+            background: var(--primary);
+            color: white;
+            padding: 4px 12px;
+            border-radius: 16px;
+            font-size: 12px;
+            font-weight: 700;
+        }
+
+        .kanban-cards {
+            flex: 1;
+            overflow-y: auto;
+            padding-right: 4px;
+        }
+
+        .kanban-cards::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .kanban-cards::-webkit-scrollbar-track {
+            background: var(--bg-secondary);
+        }
+
+        .kanban-cards::-webkit-scrollbar-thumb {
+            background: var(--border);
+            border-radius: 3px;
+        }
+
+        .kanban-card {
+            background: var(--bg-secondary);
+            padding: 16px;
+            border-radius: var(--radius-md);
+            margin-bottom: 12px;
+            cursor: move;
+            transition: var(--transition);
+            border-left: 4px solid var(--primary);
+        }
+
+        .kanban-card:hover {
+            transform: translateX(4px);
+            box-shadow: var(--shadow-md);
+            background: var(--bg-primary);
+        }
+
+        .kanban-card button {
+            cursor: pointer;
+            pointer-events: auto;
+        }
+
+        .kanban-card .action-btn {
+            position: relative;
+            z-index: 10;
+        }
+
+        .kanban-card-title {
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: var(--text-primary);
+            font-size: 15px;
+        }
+
+        .kanban-card-meta {
+            font-size: 12px;
+            color: var(--text-tertiary);
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        /* CALENDÁRIO MELHORADO */
+        .calendar-container {
+            background: var(--bg-primary);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-sm);
+            padding: 28px;
+        }
+
+        .calendar-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 28px;
+            flex-wrap: wrap;
+            gap: 16px;
+        }
+
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 24px;
+        }
+
+        .month-card {
+            border: 2px solid var(--border);
+            border-radius: var(--radius-lg);
+            padding: 20px;
+            transition: var(--transition);
+            cursor: pointer;
+            background: var(--bg-secondary);
+        }
+
+        .month-card:hover {
+            border-color: var(--primary);
+            box-shadow: var(--shadow-md);
+            transform: translateY(-2px);
+        }
+
+        .month-name {
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 16px;
+            color: var(--primary);
+            padding-bottom: 12px;
+            border-bottom: 2px solid var(--border);
+        }
+
+        .month-events {
+            list-style: none;
+        }
+
+        .month-events li {
+            padding: 10px 0;
+            border-bottom: 1px solid var(--border);
+            font-size: 13px;
+            color: var(--text-secondary);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .month-events li:last-child {
+            border-bottom: none;
+        }
+
+        .event-date {
+            font-weight: 700;
+            color: var(--text-primary);
+            background: var(--bg-tertiary);
+            padding: 4px 8px;
+            border-radius: var(--radius-sm);
+            font-size: 11px;
+        }
+
+        /* LOADING & EMPTY STATES */
+        .loading {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 60px 20px;
+            color: var(--text-tertiary);
+        }
+
+        .loading-spinner {
+            width: 48px;
+            height: 48px;
+            border: 4px solid var(--border);
+            border-top-color: var(--primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* TOAST NOTIFICATIONS */
+        .toast-container {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 2000;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .toast {
+            background: white;
+            padding: 16px 20px;
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-lg);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            min-width: 300px;
+            animation: slideInRight 0.3s ease;
+        }
+
+        @keyframes slideInRight {
+            from {
+                transform: translateX(400px);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        .toast-success {
+            border-left: 4px solid var(--success);
+        }
+
+        .toast-error {
+            border-left: 4px solid var(--danger);
+        }
+
+        .toast-info {
+            border-left: 4px solid var(--info);
+        }
+
+        .toast-icon {
+            font-size: 24px;
+        }
+
+        .toast-content {
+            flex: 1;
+        }
+
+        .toast-title {
+            font-weight: 600;
+            margin-bottom: 4px;
+            font-size: 14px;
+        }
+
+        .toast-message {
+            font-size: 13px;
+            color: var(--text-tertiary);
+        }
+
+        /* PROGRESS BAR */
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: var(--bg-tertiary);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary), var(--primary-light));
+            transition: width 0.3s ease;
+        }
+
+        /* RESPONSIVE */
+        @media (max-width: 1024px) {
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .kanban-board {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                position: fixed;
+                left: -280px;
+                z-index: 200;
+                height: 100vh;
+            }
+
+            .sidebar.show {
+                left: 0;
+            }
+
+            .header {
+                padding: 16px 20px;
+            }
+
+            .header-title {
+                font-size: 22px;
+            }
+
+            .content-area {
+                padding: 20px;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .kanban-board {
+                grid-template-columns: 1fr;
+            }
+
+            .calendar-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .search-box {
+                width: 100%;
+            }
+
+            .modal-content {
+                margin: 20px;
+                max-height: calc(100vh - 40px);
+            }
+        }
+
+        /* MOBILE MENU BUTTON */
+        .mobile-menu-btn {
+            display: none;
+            background: var(--bg-tertiary);
+            border: none;
+            width: 40px;
+            height: 40px;
+            border-radius: var(--radius-md);
+            cursor: pointer;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+        }
+
+        @media (max-width: 768px) {
+            .mobile-menu-btn {
+                display: flex;
+            }
+        }
+
+        /* OVERLAY PARA MOBILE */
+        .mobile-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 150;
+        }
+
+        .mobile-overlay.show {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <!-- TOAST CONTAINER -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <div class="app-container">
+        <!-- MOBILE OVERLAY -->
+        <div class="mobile-overlay" id="mobileOverlay" onclick="toggleMobileMenu()"></div>
+
+        <!-- SIDEBAR -->
+        <div class="sidebar" id="sidebar">
+            <div class="logo">
+                <div class="logo-content">
+                    <span class="logo-icon">🏢</span>
+                    <span class="logo-text">RH System</span>
+                </div>
+                <button class="sidebar-toggle" onclick="toggleSidebar()" title="Minimizar menu">
+                    ◀
+                </button>
+            </div>
+            <nav class="nav-menu">
+                <div class="nav-section">
+                    <div class="nav-section-title">Principal</div>
+                    <div class="nav-item active" onclick="showPage('dashboard')">
+                        <span class="nav-icon">📊</span>
+                        <span class="nav-text">Dashboard</span>
+                    </div>
+                    <div class="nav-item" onclick="showPage('colaboradores')">
+                        <span class="nav-icon">👥</span>
+                        <span class="nav-text">Colaboradores</span>
+                        <span class="nav-badge" id="navBadgeColaboradores">0</span>
+                    </div>
+                </div>
+
+                <div class="nav-section">
+                    <div class="nav-section-title">Gestão</div>
+                    <div class="nav-item" onclick="showPage('recrutamento')">
+                        <span class="nav-icon">🎯</span>
+                        <span class="nav-text">Recrutamento</span>
+                        <span class="nav-badge" id="navBadgeRecrutamento">0</span>
+                    </div>
+                    <div class="nav-item" onclick="showPage('onboarding')">
+                        <span class="nav-icon">🚀</span>
+                        <span class="nav-text">Onboarding</span>
+                    </div>
+                    <div class="nav-item" onclick="showPage('treinamentos')">
+                        <span class="nav-icon">📚</span>
+                        <span class="nav-text">Treinamentos</span>
+                    </div>
+                </div>
+
+                <div class="nav-section">
+                    <div class="nav-section-title">Ferramentas</div>
+                    <div class="nav-item" onclick="showPage('importacao')">
+                        <span class="nav-icon">📤</span>
+                        <span class="nav-text">Importar Dados</span>
+                    </div>
+                    <div class="nav-item" onclick="showPage('turnover')">
+                        <span class="nav-icon">📈</span>
+                        <span class="nav-text">Análise Turnover</span>
+                    </div>
+                </div>
+
+                <div class="nav-section">
+                    <div class="nav-section-title">Planejamento</div>
+                    <div class="nav-item" onclick="showPage('calendario')">
+                        <span class="nav-icon">📅</span>
+                        <span class="nav-text">Calendário RH</span>
+                    </div>
+                </div>
+            </nav>
+        </div>
+
+        <!-- MAIN CONTENT -->
+        <div class="main-content">
+            <div class="header">
+                <div class="header-left">
+                    <button class="mobile-menu-btn" onclick="toggleMobileMenu()">☰</button>
+                    <div>
+                        <h1 class="header-title" id="pageTitle">
+                            <span id="pageTitleIcon">📊</span>
+                            <span id="pageTitleText">Dashboard</span>
+                        </h1>
+                    </div>
+                </div>
+                <div class="header-actions">
+                    <button class="btn btn-secondary" onclick="gerarLinkCadastro()" title="Gerar link para novo colaborador">
+                        🔗 Link de Cadastro
+                    </button>
+                    <button class="btn btn-secondary" onclick="exportAllData()" title="Exportar todos os dados">
+                        💾 Exportar
+                    </button>
+                    <button class="btn btn-primary" id="mainActionBtn" onclick="addColaborador()">
+                        ➕ Novo Colaborador
+                    </button>
+                </div>
+            </div>
+
+            <div class="content-area">
+                <!-- DASHBOARD PAGE -->
+                <div id="dashboard" class="page active">
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-card-header">
+                                <div>
+                                    <div class="stat-card-label">Total de Colaboradores</div>
+                                    <div class="stat-card-value" id="totalColaboradores">0</div>
+                                    <div class="stat-card-trend trend-up">
+                                        <span>↗</span>
+                                        <span>Ativos no sistema</span>
+                                    </div>
+                                </div>
+                                <div class="stat-card-icon" style="background: linear-gradient(135deg, #ebf8ff, #bee3f8); color: #2c5282;">
+                                    👥
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="stat-card">
+                            <div class="stat-card-header">
+                                <div>
+                                    <div class="stat-card-label">Processos Seletivos</div>
+                                    <div class="stat-card-value" id="totalProcessos">0</div>
+                                    <div class="stat-card-trend trend-up">
+                                        <span>↗</span>
+                                        <span>Em andamento</span>
+                                    </div>
+                                </div>
+                                <div class="stat-card-icon" style="background: linear-gradient(135deg, #fef5e7, #feebc8); color: #744210;">
+                                    🎯
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="stat-card">
+                            <div class="stat-card-header">
+                                <div>
+                                    <div class="stat-card-label">Em Onboarding</div>
+                                    <div class="stat-card-value" id="totalOnboarding">0</div>
+                                    <div class="stat-card-trend trend-up">
+                                        <span>↗</span>
+                                        <span>Novos integrantes</span>
+                                    </div>
+                                </div>
+                                <div class="stat-card-icon" style="background: linear-gradient(135deg, #f0fdf4, #d1fae5); color: #14532d;">
+                                    🚀
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="stat-card">
+                            <div class="stat-card-header">
+                                <div>
+                                    <div class="stat-card-label">Treinamentos/Mês</div>
+                                    <div class="stat-card-value" id="totalTreinamentos">0</div>
+                                    <div class="stat-card-trend trend-up">
+                                        <span>↗</span>
+                                        <span>Programados</span>
+                                    </div>
+                                </div>
+                                <div class="stat-card-icon" style="background: linear-gradient(135deg, #fae8ff, #f3e8ff); color: #581c87;">
+                                    📚
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="table-container">
+                        <div class="table-header">
+                            <h2 class="table-title">Últimos Colaboradores Adicionados</h2>
+                            <button class="btn btn-outline" onclick="showPage('colaboradores')">
+                                Ver Todos
+                            </button>
+                        </div>
+                        <div class="table-wrapper">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Nome</th>
+                                        <th>Cargo</th>
+                                        <th>Loja</th>
+                                        <th>Status</th>
+                                        <th>Admissão</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="recentColaboradoresBody">
+                                    <tr>
+                                        <td colspan="5">
+                                            <div class="table-empty">
+                                                <div class="table-empty-icon">👥</div>
+                                                <div class="table-empty-text">Nenhum colaborador cadastrado</div>
+                                                <div class="table-empty-subtext">Comece adicionando seu primeiro colaborador</div>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- COLABORADORES PAGE -->
+                <div id="colaboradores" class="page">
+                    <div class="table-container">
+                        <div class="table-header">
+                            <h2 class="table-title">Gestão de Colaboradores</h2>
+                            <div class="table-filters">
+                                <input type="text" class="search-box" placeholder="🔍 Buscar por nome, cargo ou loja..." id="searchColaborador" onkeyup="filterColaboradores()">
+                                <select class="filter-select" id="filterStatus" onchange="filterColaboradores()">
+                                    <option value="">Todos os Status</option>
+                                    <option value="Ativo">Ativo</option>
+                                    <option value="Férias">Férias</option>
+                                    <option value="Afastado">Afastado</option>
+                                    <option value="Desligado">Desligado</option>
+                                </select>
+                                <select class="filter-select" id="filterOnboarding" onchange="filterColaboradores()">
+                                    <option value="">Todos</option>
+                                    <option value="onboarding">🚀 Em Onboarding</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="table-wrapper">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th class="sortable" onclick="sortTable('nome')">Nome</th>
+                                        <th class="sortable" onclick="sortTable('cargo')">Cargo</th>
+                                        <th>Loja</th>
+                                        <th>Status</th>
+                                        <th class="sortable" onclick="sortTable('admissao')">Admissão</th>
+                                        <th>Líder</th>
+                                        <th>Avaliação</th>
+                                        <th>Ações</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="colaboradoresTableBody">
+                                    <tr>
+                                        <td colspan="8">
+                                            <div class="table-empty">
+                                                <div class="table-empty-icon">👥</div>
+                                                <div class="table-empty-text">Nenhum colaborador encontrado</div>
+                                                <div class="table-empty-subtext">Adicione colaboradores para começar a gerenciar sua equipe</div>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- RECRUTAMENTO PAGE -->
+                <div id="recrutamento" class="page">
+                    <div style="margin-bottom: 24px;">
+                        <button class="btn btn-primary" onclick="addCandidato()">
+                            ➕ Adicionar Candidato
+                        </button>
+                    </div>
+
+                    <!-- Tabela de Gerenciamento -->
+                    <div class="table-container" style="margin-bottom: 24px;">
+                        <div class="table-header">
+                            <h2 class="table-title">Gerenciar Candidatos</h2>
+                            <input type="text" class="search-box" placeholder="🔍 Buscar candidato..." id="searchCandidato" onkeyup="filtrarCandidatos()">
+                        </div>
+                        <div class="table-wrapper">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Nome</th>
+                                        <th>Vaga</th>
+                                        <th>Email</th>
+                                        <th>Telefone</th>
+                                        <th>Fase</th>
+                                        <th>Data</th>
+                                        <th>Ações</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="recrutamentoManageTable">
+                                    <tr>
+                                        <td colspan="7">
+                                            <div class="table-empty">
+                                                <div class="table-empty-icon">🎯</div>
+                                                <div class="table-empty-text">Nenhum candidato cadastrado</div>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- Kanban Visual -->
+                    <h3 style="margin-bottom: 16px; font-size: 18px;">Funil de Recrutamento</h3>
+                    <div class="kanban-board">
+                        <div class="kanban-column">
+                            <div class="kanban-header">
+                                <span>📝 Triagem</span>
+                                <span class="kanban-count" id="count-triagem">0</span>
+                            </div>
+                            <div class="kanban-cards" id="kanban-triagem"></div>
+                        </div>
+
+                        <div class="kanban-column">
+                            <div class="kanban-header">
+                                <span>📞 Entrevista RH</span>
+                                <span class="kanban-count" id="count-entrevista">0</span>
+                            </div>
+                            <div class="kanban-cards" id="kanban-entrevista"></div>
+                        </div>
+
+                        <div class="kanban-column">
+                            <div class="kanban-header">
+                                <span>👔 Entrevista Gestor</span>
+                                <span class="kanban-count" id="count-gestor">0</span>
+                            </div>
+                            <div class="kanban-cards" id="kanban-gestor"></div>
+                        </div>
+
+                        <div class="kanban-column">
+                            <div class="kanban-header">
+                                <span>✅ Aprovados</span>
+                                <span class="kanban-count" id="count-aprovado">0</span>
+                            </div>
+                            <div class="kanban-cards" id="kanban-aprovado"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ONBOARDING PAGE -->
+                <div id="onboarding" class="page">
+                    <div style="margin-bottom: 24px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px;">
+                        <div>
+                            <h3 style="margin-bottom: 8px; font-size: 18px;">Acompanhe a Integração dos Novos Colaboradores</h3>
+                            <p style="color: var(--text-tertiary); font-size: 14px;">Gerencie o processo de onboarding</p>
+                        </div>
+                        <button class="btn btn-primary" onclick="addOnboarding()">
+                            ➕ Iniciar Integração
+                        </button>
+                    </div>
+
+                    <!-- Tabela de Gerenciamento -->
+                    <div class="table-container" style="margin-bottom: 24px;">
+                        <div class="table-header">
+                            <h2 class="table-title">Gerenciar Processos</h2>
+                        </div>
+                        <div class="table-wrapper">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Nome</th>
+                                        <th>Cargo</th>
+                                        <th>Fase</th>
+                                        <th>Responsável</th>
+                                        <th>Dias</th>
+                                        <th>Ações</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="onboardingManageTable">
+                                    <tr>
+                                        <td colspan="6">
+                                            <div class="table-empty">
+                                                <div class="table-empty-icon">🚀</div>
+                                                <div class="table-empty-text">Nenhum processo ativo</div>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- Kanban Visual -->
+                    <div class="kanban-board">
+                        <div class="kanban-column">
+                            <div class="kanban-header">
+                                <span>📋 Documentação</span>
+                                <span class="kanban-count" id="count-documentacao">0</span>
+                            </div>
+                            <div class="kanban-cards" id="kanban-documentacao"></div>
+                        </div>
+
+                        <div class="kanban-column">
+                            <div class="kanban-header">
+                                <span>🎓 Treinamento Inicial</span>
+                                <span class="kanban-count" id="count-treinamento">0</span>
+                            </div>
+                            <div class="kanban-cards" id="kanban-treinamento"></div>
+                        </div>
+
+                        <div class="kanban-column">
+                            <div class="kanban-header">
+                                <span>🤝 Integração com Time</span>
+                                <span class="kanban-count" id="count-integracao">0</span>
+                            </div>
+                            <div class="kanban-cards" id="kanban-integracao"></div>
+                        </div>
+
+                        <div class="kanban-column">
+                            <div class="kanban-header">
+                                <span>⚡ Em Atividade</span>
+                                <span class="kanban-count" id="count-atividade">0</span>
+                            </div>
+                            <div class="kanban-cards" id="kanban-atividade"></div>
+                        </div>
+
+                        <div class="kanban-column">
+                            <div class="kanban-header">
+                                <span>✅ Concluído</span>
+                                <span class="kanban-count" id="count-concluido">0</span>
+                            </div>
+                            <div class="kanban-cards" id="kanban-concluido"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- TREINAMENTOS PAGE -->
+                <div id="treinamentos" class="page">
+                    <div class="table-container">
+                        <div class="table-header">
+                            <h2 class="table-title">Programas de Treinamento</h2>
+                            <button class="btn btn-primary" onclick="addTreinamento()">
+                                ➕ Novo Treinamento
+                            </button>
+                        </div>
+                        <div class="table-wrapper">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Treinamento</th>
+                                        <th>Categoria</th>
+                                        <th>Data</th>
+                                        <th>Duração</th>
+                                        <th>Participantes</th>
+                                        <th>Instrutor</th>
+                                        <th>Status</th>
+                                        <th>Ações</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="treinamentosTableBody">
+                                    <tr>
+                                        <td colspan="8">
+                                            <div class="table-empty">
+                                                <div class="table-empty-icon">📚</div>
+                                                <div class="table-empty-text">Nenhum treinamento cadastrado</div>
+                                                <div class="table-empty-subtext">Adicione treinamentos para desenvolver sua equipe</div>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- CALENDARIO PAGE -->
+                <div id="calendario" class="page">
+                    <div class="calendar-container">
+                        <div class="calendar-header">
+                            <h2 class="table-title">📅 Calendário de Desenvolvimento 2026</h2>
+                            <button class="btn btn-primary" onclick="addEvento()">
+                                ➕ Novo Evento
+                            </button>
+                        </div>
+                        <div class="calendar-grid" id="calendarGrid"></div>
+                    </div>
+                </div>
+
+                <!-- IMPORTAÇÃO PAGE -->
+                <div id="importacao" class="page">
+                    <div class="stats-grid" style="grid-template-columns: repeat(2, 1fr); margin-bottom: 32px;">
+                        <div class="stat-card">
+                            <div style="text-align: center; padding: 20px;">
+                                <div style="font-size: 48px; margin-bottom: 16px;">👥</div>
+                                <h3 style="margin-bottom: 12px; font-size: 20px;">Importar Colaboradores</h3>
+                                <p style="color: var(--text-tertiary); font-size: 14px; margin-bottom: 24px;">
+                                    Importe múltiplos colaboradores de uma planilha CSV
+                                </p>
+                                <input type="file" id="csvColaboradores" accept=".csv" style="display: none;" onchange="importarColaboradores(event)">
+                                <button class="btn btn-primary" onclick="document.getElementById('csvColaboradores').click()">
+                                    📤 Selecionar Arquivo CSV
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="stat-card">
+                            <div style="text-align: center; padding: 20px;">
+                                <div style="font-size: 48px; margin-bottom: 16px;">🎯</div>
+                                <h3 style="margin-bottom: 12px; font-size: 20px;">Importar Candidatos</h3>
+                                <p style="color: var(--text-tertiary); font-size: 14px; margin-bottom: 24px;">
+                                    Importe múltiplos candidatos para o recrutamento
+                                </p>
+                                <input type="file" id="csvCandidatos" accept=".csv" style="display: none;" onchange="importarCandidatos(event)">
+                                <button class="btn btn-primary" onclick="document.getElementById('csvCandidatos').click()">
+                                    📤 Selecionar Arquivo CSV
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="table-container">
+                        <div class="table-header">
+                            <h2 class="table-title">📋 Formato do CSV</h2>
+                        </div>
+                        <div style="padding: 28px;">
+                            <h3 style="margin-bottom: 16px; color: var(--text-primary);">Colaboradores CSV</h3>
+                            <div style="background: var(--bg-secondary); padding: 16px; border-radius: var(--radius-md); font-family: monospace; font-size: 13px; overflow-x: auto; margin-bottom: 24px;">
+                                nome,cargo,status,loja,admissao,desligamento,lider,regime,email,telefone<br>
+                                João Silva,Vendedor,Ativo,Loja Centro,2024-01-15,,Maria Santos,CLT,joao@email.com,(11) 99999-0001<br>
+                                Ana Costa,Gerente,Ativo,Loja Sul,2023-06-10,,Roberto Lima,CLT,ana@email.com,(11) 99999-0002
+                            </div>
+
+                            <h3 style="margin-bottom: 16px; color: var(--text-primary);">Candidatos CSV</h3>
+                            <div style="background: var(--bg-secondary); padding: 16px; border-radius: var(--radius-md); font-family: monospace; font-size: 11px; overflow-x: auto; line-height: 1.6;">
+                                nome_completo,data_nascimento,sexo,telefone,estado_civil,cidade,bairro,escolaridade,como_soube,cidade_candidatura,disponibilidade,experiencia_vendas,tempo_experiencia,porque_gardeni,curriculo_link<br>
+                                João Silva Santos,15/05/1995,Masculino,(99) 98877-6655,Solteiro,Imperatriz,Centro,Ensino Superior Completo,Instagram,Imperatriz/MA,Sim,Sim,3 anos,Porque admiro a empresa,https://...<br>
+                                Maria Oliveira,22/03/1998,Feminino,(99) 91234-5678,Casada,Açailândia,Tropical,Ensino Médio Completo,Indicação,Açailândia/MA,Sim,Não,,Quero crescer na área,https://...
+                            </div>
+
+                            <div style="margin-top: 20px; padding: 16px; background: linear-gradient(135deg, rgba(237, 137, 54, 0.1), rgba(251, 191, 36, 0.1)); border-radius: var(--radius-md); border-left: 4px solid var(--warning);">
+                                <p style="font-size: 14px; color: var(--text-primary); margin-bottom: 8px;">
+                                    <strong>📋 Detalhes dos Campos de Candidatos:</strong>
+                                </p>
+                                <ul style="margin-left: 20px; color: var(--text-secondary); font-size: 12px; line-height: 1.8;">
+                                    <li><strong>nome_completo:</strong> Nome completo do candidato</li>
+                                    <li><strong>data_nascimento:</strong> Formato DD/MM/AAAA (ex: 15/05/1995)</li>
+                                    <li><strong>sexo:</strong> Masculino, Feminino ou Outro</li>
+                                    <li><strong>telefone:</strong> WhatsApp com DDD (ex: (99) 98877-6655)</li>
+                                    <li><strong>estado_civil:</strong> Solteiro, Casado, Divorciado, Viúvo</li>
+                                    <li><strong>cidade:</strong> Nome da cidade onde mora</li>
+                                    <li><strong>bairro:</strong> Bairro onde reside</li>
+                                    <li><strong>escolaridade:</strong> Fundamental, Médio Incompleto, Médio Completo, Superior Incompleto, Superior Completo, Pós-graduação</li>
+                                    <li><strong>como_soube:</strong> Instagram, Facebook, LinkedIn, Site, Indicação, Outros</li>
+                                    <li><strong>cidade_candidatura:</strong> Para qual loja está se candidatando (ex: Imperatriz/MA)</li>
+                                    <li><strong>disponibilidade:</strong> Sim ou Não (período integral presencial)</li>
+                                    <li><strong>experiencia_vendas:</strong> Sim ou Não</li>
+                                    <li><strong>tempo_experiencia:</strong> Se sim, quanto tempo (ex: 2 anos, 6 meses)</li>
+                                    <li><strong>porque_gardeni:</strong> Motivação para trabalhar na Gardeni Móveis</li>
+                                    <li><strong>curriculo_link:</strong> Link do Google Drive, Dropbox ou outro (opcional)</li>
+                                </ul>
+                            </div>
+
+                            <div style="margin-top: 24px; padding: 20px; background: linear-gradient(135deg, rgba(102, 126, 234, 0.1), rgba(118, 75, 162, 0.1)); border-radius: var(--radius-lg); border-left: 4px solid var(--info);">
+                                <p style="font-size: 14px; color: var(--text-primary); margin-bottom: 8px;">
+                                    <strong>💡 Dicas importantes:</strong>
+                                </p>
+                                <ul style="margin-left: 20px; color: var(--text-secondary); font-size: 13px; line-height: 1.8;">
+                                    <li>A primeira linha deve conter os nomes das colunas exatamente como mostrado</li>
+                                    <li>Use vírgula (,) como separador</li>
+                                    <li>Datas no formato AAAA-MM-DD (ex: 2024-01-15)</li>
+                                    <li>Campos vazios podem ser deixados em branco mas mantenha as vírgulas</li>
+                                    <li>Para candidatos, fase pode ser: triagem, entrevista, gestor ou aprovado</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ANÁLISE TURNOVER PAGE -->
+                <div id="turnover" class="page">
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-card-header">
+                                <div>
+                                    <div class="stat-card-label">Turnover Geral</div>
+                                    <div class="stat-card-value" id="turnoverGeral">0%</div>
+                                    <div class="stat-card-trend">
+                                        <span id="turnoverGeralPeriodo">Últimos 12 meses</span>
+                                    </div>
+                                </div>
+                                <div class="stat-card-icon" style="background: linear-gradient(135deg, #fee2e2, #fecaca); color: #991b1b;">
+                                    📉
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="stat-card">
+                            <div class="stat-card-header">
+                                <div>
+                                    <div class="stat-card-label">Admissões (12 meses)</div>
+                                    <div class="stat-card-value" id="totalAdmissoes">0</div>
+                                    <div class="stat-card-trend trend-up">
+                                        <span>↗</span>
+                                        <span>Novos colaboradores</span>
+                                    </div>
+                                </div>
+                                <div class="stat-card-icon" style="background: linear-gradient(135deg, #d1fae5, #a7f3d0); color: #065f46;">
+                                    ➕
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="stat-card">
+                            <div class="stat-card-header">
+                                <div>
+                                    <div class="stat-card-label">Desligamentos (12 meses)</div>
+                                    <div class="stat-card-value" id="totalDesligamentos">0</div>
+                                    <div class="stat-card-trend trend-down">
+                                        <span>↘</span>
+                                        <span>Saídas registradas</span>
+                                    </div>
+                                </div>
+                                <div class="stat-card-icon" style="background: linear-gradient(135deg, #fed7aa, #fdba74); color: #7c2d12;">
+                                    ➖
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="stat-card">
+                            <div class="stat-card-header">
+                                <div>
+                                    <div class="stat-card-label">Headcount Atual</div>
+                                    <div class="stat-card-value" id="headcountAtual">0</div>
+                                    <div class="stat-card-trend">
+                                        <span>Colaboradores ativos</span>
+                                    </div>
+                                </div>
+                                <div class="stat-card-icon" style="background: linear-gradient(135deg, #dbeafe, #bfdbfe); color: #1e40af;">
+                                    👥
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="table-container">
+                        <div class="table-header">
+                            <h2 class="table-title">📊 Turnover por Loja</h2>
+                            <select class="filter-select" id="turnoverPeriodo" onchange="calcularTurnover()">
+                                <option value="6">Últimos 6 meses</option>
+                                <option value="12" selected>Últimos 12 meses</option>
+                                <option value="24">Últimos 24 meses</option>
+                            </select>
+                        </div>
+                        <div class="table-wrapper">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Loja/Unidade</th>
+                                        <th>Headcount Atual</th>
+                                        <th>Admissões</th>
+                                        <th>Desligamentos</th>
+                                        <th>Taxa de Turnover</th>
+                                        <th>Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="turnoverTableBody">
+                                    <tr>
+                                        <td colspan="6">
+                                            <div class="table-empty">
+                                                <div class="table-empty-icon">📈</div>
+                                                <div class="table-empty-text">Calculando turnover...</div>
+                                                <div class="table-empty-subtext">Dados serão exibidos após cadastro de colaboradores</div>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <div class="table-container" style="margin-top: 24px;">
+                        <div class="table-header">
+                            <h2 class="table-title">📋 Desligamentos Recentes</h2>
+                        </div>
+                        <div class="table-wrapper">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Nome</th>
+                                        <th>Cargo</th>
+                                        <th>Loja</th>
+                                        <th>Admissão</th>
+                                        <th>Desligamento</th>
+                                        <th>Tempo na Empresa</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="desligamentosTableBody">
+                                    <tr>
+                                        <td colspan="6">
+                                            <div class="table-empty">
+                                                <div class="table-empty-icon">📋</div>
+                                                <div class="table-empty-text">Nenhum desligamento registrado</div>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAIS -->
+    <!-- Modal Colaborador -->
+    <div id="modalColaborador" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div>
+                    <h2 class="modal-title">➕ Adicionar Colaborador</h2>
+                    <p class="modal-subtitle">Preencha os dados do novo colaborador</p>
+                </div>
+            </div>
+            <div class="modal-body">
+                <form id="formColaborador">
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label>Nome Completo <span class="required">*</span></label>
+                            <input type="text" id="colabNome" required placeholder="João da Silva">
+                        </div>
+                        <div class="form-group">
+                            <label>Cargo <span class="required">*</span></label>
+                            <input type="text" id="colabCargo" required placeholder="Analista de Vendas">
+                        </div>
+                        <div class="form-group">
+                            <label>Status <span class="required">*</span></label>
+                            <select id="colabStatus" required>
+                                <option value="Ativo">✅ Ativo</option>
+                                <option value="Férias">🏖️ Férias</option>
+                                <option value="Afastado">🏥 Afastado</option>
+                                <option value="Desligado">❌ Desligado</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Loja/Unidade <span class="required">*</span></label>
+                            <select id="colabLoja" required>
+                                <option value="">Selecione a loja...</option>
+                                <option value="Açailândia/MA">🏪 Açailândia/MA</option>
+                                <option value="Imperatriz/MA">🏪 Imperatriz/MA</option>
+                                <option value="São Francisco do Brejão/MA">🏪 São Francisco do Brejão/MA</option>
+                                <option value="Santa Inês/MA">🏪 Santa Inês/MA</option>
+                                <option value="Zé Doca/MA">🏪 Zé Doca/MA</option>
+                                <option value="Araguaína/TO">🏪 Araguaína/TO</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Data de Admissão <span class="required">*</span></label>
+                            <input type="date" id="colabAdmissao" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Data de Desligamento</label>
+                            <input type="date" id="colabDesligamento">
+                            <div class="form-help">Preencher apenas se o colaborador foi desligado</div>
+                        </div>
+                        <div class="form-group">
+                            <label>Líder Direto</label>
+                            <input type="text" id="colabLider" placeholder="Nome do líder">
+                        </div>
+                        <div class="form-group">
+                            <label>Regime Trabalhista <span class="required">*</span></label>
+                            <select id="colabRegime" required>
+                                <option value="">Selecione...</option>
+                                <option value="CLT">CLT - Consolidação das Leis do Trabalho</option>
+                                <option value="PJ">PJ - Pessoa Jurídica</option>
+                                <option value="Estágio">Estágio</option>
+                                <option value="Temporário">Temporário</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Última Avaliação</label>
+                            <select id="colabAvaliacao">
+                                <option value="">Não avaliado</option>
+                                <option value="⭐⭐⭐⭐⭐">⭐⭐⭐⭐⭐ Excepcional</option>
+                                <option value="⭐⭐⭐⭐">⭐⭐⭐⭐ Ótimo</option>
+                                <option value="⭐⭐⭐">⭐⭐⭐ Bom</option>
+                                <option value="⭐⭐">⭐⭐ Regular</option>
+                                <option value="⭐">⭐ Necessita Melhoria</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Email</label>
+                            <input type="email" id="colabEmail" placeholder="colaborador@empresa.com">
+                        </div>
+                        <div class="form-group">
+                            <label>Telefone</label>
+                            <input type="tel" id="colabTelefone" placeholder="(00) 00000-0000">
+                        </div>
+                        <div class="form-group full-width">
+                            <label>Responsograma (Principais Responsabilidades)</label>
+                            <textarea id="colabResponsograma" placeholder="Descreva as principais responsabilidades e atribuições do cargo..."></textarea>
+                            <div class="form-help">Liste as atividades e responsabilidades chave da função</div>
+                        </div>
+                        <div class="form-group full-width">
+                            <label>Perfil Comportamental</label>
+                            <select id="colabPerfilComportamental">
+                                <option value="">Não realizado</option>
+                                <optgroup label="DISC">
+                                    <option value="DISC - Dominante">Dominante (Direto, Decisivo, Orientado a Resultados)</option>
+                                    <option value="DISC - Influente">Influente (Comunicativo, Entusiasta, Persuasivo)</option>
+                                    <option value="DISC - Estável">Estável (Paciente, Leal, Consistente)</option>
+                                    <option value="DISC - Conforme">Conforme (Analítico, Preciso, Metódico)</option>
+                                </optgroup>
+                                <optgroup label="MBTI">
+                                    <option value="MBTI - INTJ">INTJ - Estrategista</option>
+                                    <option value="MBTI - ENFP">ENFP - Ativista</option>
+                                    <option value="MBTI - ISTJ">ISTJ - Logístico</option>
+                                    <option value="MBTI - ESFJ">ESFJ - Cônsul</option>
+                                </optgroup>
+                            </select>
+                            <div class="form-help">Resultado de teste comportamental aplicado (DISC, MBTI, etc.)</div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-actions">
+                <button type="button" class="btn btn-secondary" onclick="closeModal('modalColaborador')">Cancelar</button>
+                <button type="button" class="btn btn-primary" onclick="document.getElementById('formColaborador').requestSubmit()">💾 Salvar Colaborador</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Recrutamento -->
+    <div id="modalRecrutamento" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div>
+                    <h2 class="modal-title">🎯 Novo Processo Seletivo</h2>
+                    <p class="modal-subtitle">Adicione um candidato ao funil de recrutamento</p>
+                </div>
+            </div>
+            <div class="modal-body">
+                <form id="formRecrutamento">
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label>Nome do Candidato <span class="required">*</span></label>
+                            <input type="text" id="recNome" required placeholder="Nome completo">
+                        </div>
+                        <div class="form-group">
+                            <label>Vaga <span class="required">*</span></label>
+                            <input type="text" id="recVaga" required placeholder="Ex: Analista de Vendas">
+                        </div>
+                        <div class="form-group">
+                            <label>Email</label>
+                            <input type="email" id="recEmail" placeholder="candidato@email.com">
+                        </div>
+                        <div class="form-group">
+                            <label>Telefone</label>
+                            <input type="tel" id="recTelefone" placeholder="(00) 00000-0000">
+                        </div>
+                        <div class="form-group">
+                            <label>Fase do Processo <span class="required">*</span></label>
+                            <select id="recFase" required>
+                                <option value="triagem">📝 Triagem</option>
+                                <option value="entrevista">📞 Entrevista RH</option>
+                                <option value="gestor">👔 Entrevista Gestor</option>
+                                <option value="aprovado">✅ Aprovado</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Data de Aplicação</label>
+                            <input type="date" id="recData">
+                        </div>
+                        <div class="form-group full-width">
+                            <label>Observações</label>
+                            <textarea id="recObs" placeholder="Anotações sobre o candidato, pontos fortes, etc."></textarea>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-actions">
+                <button type="button" class="btn btn-secondary" onclick="closeModal('modalRecrutamento')">Cancelar</button>
+                <button type="button" class="btn btn-primary" onclick="document.getElementById('formRecrutamento').requestSubmit()">Adicionar Candidato</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Onboarding -->
+    <div id="modalOnboarding" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div>
+                    <h2 class="modal-title">🚀 Iniciar Processo de Integração</h2>
+                    <p class="modal-subtitle">Selecione um colaborador para começar o onboarding</p>
+                </div>
+            </div>
+            <div class="modal-body">
+                <form id="formOnboarding">
+                    <div class="form-grid">
+                        <div class="form-group full-width">
+                            <label>Colaborador <span class="required">*</span></label>
+                            <select id="onbColaboradorId" required onchange="preencherDadosColaborador()">
+                                <option value="">Selecione um colaborador...</option>
+                            </select>
+                            <div class="form-help">Apenas colaboradores ativos sem onboarding em andamento</div>
+                        </div>
+                        <div class="form-group">
+                            <label>Cargo</label>
+                            <input type="text" id="onbCargo" readonly style="background: var(--bg-tertiary);">
+                        </div>
+                        <div class="form-group">
+                            <label>Loja/Unidade</label>
+                            <input type="text" id="onbLoja" readonly style="background: var(--bg-tertiary);">
+                        </div>
+                        <div class="form-group">
+                            <label>Data de Início <span class="required">*</span></label>
+                            <input type="date" id="onbInicio" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Responsável pela Integração <span class="required">*</span></label>
+                            <input type="text" id="onbResponsavel" required placeholder="Nome do responsável">
+                        </div>
+                        <div class="form-group full-width">
+                            <label>Fase Inicial</label>
+                            <select id="onbFase">
+                                <option value="documentacao">📋 Documentação</option>
+                                <option value="treinamento">🎓 Treinamento Inicial</option>
+                                <option value="integracao">🤝 Integração com Time</option>
+                                <option value="atividade">⚡ Em Atividade</option>
+                            </select>
+                            <div class="form-help">Etapa atual do processo de integração</div>
+                        </div>
+                        <div class="form-group full-width">
+                            <label>Observações</label>
+                            <textarea id="onbObservacoes" placeholder="Notas sobre o processo de integração..." rows="3"></textarea>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-actions">
+                <button type="button" class="btn btn-danger" id="btnExcluirOnboarding" style="margin-right: auto; background: var(--danger); color: white; display: none;">
+                    🗑️ Excluir Processo
+                </button>
+                <button type="button" class="btn btn-secondary" onclick="closeModal('modalOnboarding')">Cancelar</button>
+                <button type="button" class="btn btn-primary" onclick="document.getElementById('formOnboarding').requestSubmit()">Salvar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Treinamento -->
+    <div id="modalTreinamento" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div>
+                    <h2 class="modal-title">📚 Novo Treinamento</h2>
+                    <p class="modal-subtitle">Cadastre um programa de capacitação</p>
+                </div>
+            </div>
+            <div class="modal-body">
+                <form id="formTreinamento">
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label>Nome do Treinamento <span class="required">*</span></label>
+                            <input type="text" id="treinNome" required placeholder="Ex: Técnicas de Vendas Avançadas">
+                        </div>
+                        <div class="form-group">
+                            <label>Categoria <span class="required">*</span></label>
+                            <select id="treinCategoria" required>
+                                <option value="">Selecione...</option>
+                                <option value="Técnico">💻 Técnico</option>
+                                <option value="Comportamental">🧠 Comportamental</option>
+                                <option value="Liderança">👔 Liderança</option>
+                                <option value="Vendas">💰 Vendas</option>
+                                <option value="Segurança">🛡️ Segurança</option>
+                                <option value="Compliance">📋 Compliance</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Data <span class="required">*</span></label>
+                            <input type="date" id="treinData" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Duração (horas)</label>
+                            <input type="number" id="treinDuracao" min="0" step="0.5" placeholder="Ex: 8">
+                        </div>
+                        <div class="form-group">
+                            <label>Número de Participantes</label>
+                            <input type="number" id="treinParticipantes" min="0" placeholder="Ex: 15">
+                        </div>
+                        <div class="form-group">
+                            <label>Instrutor</label>
+                            <input type="text" id="treinInstrutor" placeholder="Nome do instrutor">
+                        </div>
+                        <div class="form-group full-width">
+                            <label>Status</label>
+                            <select id="treinStatus">
+                                <option value="Planejado">📅 Planejado</option>
+                                <option value="Em andamento">🔄 Em andamento</option>
+                                <option value="Concluído">✅ Concluído</option>
+                                <option value="Cancelado">❌ Cancelado</option>
+                            </select>
+                        </div>
+                        <div class="form-group full-width">
+                            <label>Descrição</label>
+                            <textarea id="treinDescricao" placeholder="Descrição detalhada do treinamento, objetivos e conteúdo programático..."></textarea>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-actions">
+                <button type="button" class="btn btn-secondary" onclick="closeModal('modalTreinamento')">Cancelar</button>
+                <button type="button" class="btn btn-primary" onclick="document.getElementById('formTreinamento').requestSubmit()">Salvar Treinamento</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Evento Calendário -->
+    <div id="modalEvento" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div>
+                    <h2 class="modal-title">📅 Novo Evento no Calendário</h2>
+                    <p class="modal-subtitle">Adicione um evento ao planejamento anual</p>
+                </div>
+            </div>
+            <div class="modal-body">
+                <form id="formEvento">
+                    <div class="form-grid">
+                        <div class="form-group full-width">
+                            <label>Título do Evento <span class="required">*</span></label>
+                            <input type="text" id="eventoTitulo" required placeholder="Nome do evento">
+                        </div>
+                        <div class="form-group">
+                            <label>Data <span class="required">*</span></label>
+                            <input type="date" id="eventoData" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Categoria</label>
+                            <select id="eventoCategoria">
+                                <option value="Treinamento">📚 Treinamento</option>
+                                <option value="Avaliação">⭐ Avaliação de Desempenho</option>
+                                <option value="Integração">🚀 Integração</option>
+                                <option value="Evento">🎉 Evento Corporativo</option>
+                                <option value="Recrutamento">🎯 Recrutamento</option>
+                                <option value="Reunião">💼 Reunião</option>
+                            </select>
+                        </div>
+                        <div class="form-group full-width">
+                            <label>Descrição</label>
+                            <textarea id="eventoDescricao" placeholder="Detalhes do evento..."></textarea>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-actions">
+                <button type="button" class="btn btn-secondary" onclick="closeModal('modalEvento')">Cancelar</button>
+                <button type="button" class="btn btn-primary" onclick="document.getElementById('formEvento').requestSubmit()">Adicionar Evento</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Link de Cadastro -->
+    <div id="modalLinkCadastro" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div>
+                    <h2 class="modal-title">🔗 Link de Cadastro Gerado</h2>
+                    <p class="modal-subtitle">Compartilhe este link com o novo colaborador</p>
+                </div>
+            </div>
+            <div class="modal-body">
+                <div style="background: var(--bg-secondary); padding: 24px; border-radius: var(--radius-lg); margin-bottom: 24px;">
+                    <p style="margin-bottom: 16px; color: var(--text-secondary); font-size: 14px;">
+                        ✨ Envie este link para o colaborador preencher seus dados de forma autônoma:
+                    </p>
+                    <div style="display: flex; gap: 12px; align-items: center;">
+                        <input 
+                            type="text" 
+                            id="linkGerado" 
+                            readonly 
+                            style="flex: 1; padding: 12px; border: 2px solid var(--border); border-radius: var(--radius-md); font-family: 'Courier New', monospace; font-size: 13px; background: var(--bg-primary);"
+                        >
+                        <button class="btn btn-primary" onclick="copiarLink()">
+                            📋 Copiar
+                        </button>
+                    </div>
+                    <p id="linkCopiado" style="color: var(--success); font-size: 13px; margin-top: 12px; display: none; font-weight: 600;">
+                        ✅ Link copiado com sucesso!
+                    </p>
+                </div>
+                <div style="background: linear-gradient(135deg, rgba(66, 153, 225, 0.1), rgba(102, 126, 234, 0.1)); padding: 20px; border-radius: var(--radius-lg); border-left: 4px solid var(--info);">
+                    <p style="font-size: 14px; color: var(--text-primary); margin-bottom: 8px;">
+                        <strong>💡 Como funciona:</strong>
+                    </p>
+                    <ul style="margin-left: 20px; color: var(--text-secondary); font-size: 13px; line-height: 1.8;">
+                        <li>O colaborador receberá um formulário limpo e intuitivo</li>
+                        <li>Após o preenchimento, os dados aparecem automaticamente aqui</li>
+                        <li>Um processo de onboarding é criado automaticamente</li>
+                        <li>O link pode ser usado apenas uma vez por segurança</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="modal-actions">
+                <button type="button" class="btn btn-primary" onclick="closeModal('modalLinkCadastro')">Entendi</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Cadastro Público -->
+    <div id="modalCadastroPublico" class="modal">
+        <div class="modal-content" style="max-width: 700px;">
+            <div class="modal-header">
+                <div>
+                    <h2 class="modal-title">👋 Bem-vindo(a)!</h2>
+                    <p class="modal-subtitle">Complete seu cadastro para fazer parte do nosso time</p>
+                </div>
+            </div>
+            <div class="modal-body">
+                <form id="formCadastroPublico">
+                    <div class="form-grid">
+                        <div class="form-group full-width">
+                            <label>Nome Completo <span class="required">*</span></label>
+                            <input type="text" id="pubNome" required placeholder="Seu nome completo">
+                        </div>
+                        <div class="form-group">
+                            <label>Email <span class="required">*</span></label>
+                            <input type="email" id="pubEmail" required placeholder="seu.email@exemplo.com">
+                        </div>
+                        <div class="form-group">
+                            <label>Telefone <span class="required">*</span></label>
+                            <input type="tel" id="pubTelefone" required placeholder="(00) 00000-0000">
+                        </div>
+                        <div class="form-group">
+                            <label>Cargo <span class="required">*</span></label>
+                            <input type="text" id="pubCargo" required placeholder="Ex: Analista de Vendas">
+                        </div>
+                        <div class="form-group">
+                            <label>Loja/Unidade <span class="required">*</span></label>
+                            <select id="pubLoja" required>
+                                <option value="">Selecione a loja...</option>
+                                <option value="Açailândia/MA">🏪 Açailândia/MA</option>
+                                <option value="Imperatriz/MA">🏪 Imperatriz/MA</option>
+                                <option value="São Francisco do Brejão/MA">🏪 São Francisco do Brejão/MA</option>
+                                <option value="Santa Inês/MA">🏪 Santa Inês/MA</option>
+                                <option value="Zé Doca/MA">🏪 Zé Doca/MA</option>
+                                <option value="Araguaína/TO">🏪 Araguaína/TO</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Data de Admissão <span class="required">*</span></label>
+                            <input type="date" id="pubAdmissao" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Líder Direto</label>
+                            <input type="text" id="pubLider" placeholder="Nome do seu líder">
+                        </div>
+                        <div class="form-group">
+                            <label>Regime de Trabalho <span class="required">*</span></label>
+                            <select id="pubRegime" required>
+                                <option value="">Selecione...</option>
+                                <option value="CLT">CLT</option>
+                                <option value="PJ">PJ</option>
+                                <option value="Estágio">Estágio</option>
+                                <option value="Temporário">Temporário</option>
+                            </select>
+                        </div>
+                        <div class="form-group full-width">
+                            <label>Principais Responsabilidades do Cargo</label>
+                            <textarea id="pubResponsograma" placeholder="Descreva brevemente suas principais responsabilidades..." rows="3"></textarea>
+                        </div>
+                        <div class="form-group full-width">
+                            <label>Perfil Comportamental (Opcional)</label>
+                            <select id="pubPerfil">
+                                <option value="">Não sei/Não fiz o teste</option>
+                                <optgroup label="DISC">
+                                    <option value="DISC - Dominante">Dominante</option>
+                                    <option value="DISC - Influente">Influente</option>
+                                    <option value="DISC - Estável">Estável</option>
+                                    <option value="DISC - Conforme">Conforme</option>
+                                </optgroup>
+                                <optgroup label="MBTI">
+                                    <option value="MBTI - INTJ">INTJ - Estrategista</option>
+                                    <option value="MBTI - ENFP">ENFP - Ativista</option>
+                                    <option value="MBTI - ISTJ">ISTJ - Logístico</option>
+                                    <option value="MBTI - ESFJ">ESFJ - Cônsul</option>
+                                </optgroup>
+                            </select>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-actions">
+                <button type="button" class="btn btn-primary btn-lg" onclick="document.getElementById('formCadastroPublico').requestSubmit()" style="width: 100%;">
+                    ✅ Enviar Cadastro
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // DADOS GLOBAIS
+        let colaboradores = [];
+        let processosSeletivos = [];
+        let onboardingProcessos = [];
+        let treinamentos = [];
+        let eventosCalendario = [];
+        let currentSort = { column: null, direction: 'asc' };
+
+        // INICIALIZAÇÃO
+        function init() {
+            loadData();
+            renderDashboard();
+            renderColaboradores();
+            renderRecrutamento();
+            renderOnboarding();
+            renderTreinamentos();
+            renderCalendario();
+            updateNavBadges();
+        }
+
+        // NAVEGAÇÃO
+        function showPage(pageId) {
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+            
+            document.getElementById(pageId).classList.add('active');
+            event.target.closest('.nav-item').classList.add('active');
+            
+            const pageTitles = {
+                'dashboard': { icon: '📊', text: 'Dashboard' },
+                'colaboradores': { icon: '👥', text: 'Colaboradores' },
+                'recrutamento': { icon: '🎯', text: 'Recrutamento & Seleção' },
+                'onboarding': { icon: '🚀', text: 'Onboarding & Integração' },
+                'treinamentos': { icon: '📚', text: 'Treinamentos' },
+                'calendario': { icon: '📅', text: 'Calendário de Desenvolvimento' },
+                'importacao': { icon: '📤', text: 'Importar Dados' },
+                'turnover': { icon: '📈', text: 'Análise de Turnover' }
+            };
+            
+            document.getElementById('pageTitleIcon').textContent = pageTitles[pageId].icon;
+            document.getElementById('pageTitleText').textContent = pageTitles[pageId].text;
+            
+            const actionBtn = document.getElementById('mainActionBtn');
+            const actions = {
+                'dashboard': { text: '➕ Novo Colaborador', onclick: 'addColaborador()' },
+                'colaboradores': { text: '➕ Novo Colaborador', onclick: 'addColaborador()' },
+                'recrutamento': { text: '➕ Novo Candidato', onclick: 'addCandidato()' },
+                'onboarding': { text: '➕ Novo Processo', onclick: 'addOnboarding()' },
+                'treinamentos': { text: '➕ Novo Treinamento', onclick: 'addTreinamento()' },
+                'calendario': { text: '➕ Novo Evento', onclick: 'addEvento()' },
+                'importacao': { text: '📥 Baixar Modelo CSV', onclick: 'baixarModeloCSV()' },
+                'turnover': { text: '🔄 Atualizar Análise', onclick: 'calcularTurnover()' }
+            };
+            
+            actionBtn.textContent = actions[pageId].text;
+            actionBtn.setAttribute('onclick', actions[pageId].onclick);
+            
+            // Renderizar página específica se necessário
+            if (pageId === 'turnover') {
+                calcularTurnover();
+            }
+            
+            // Fechar menu mobile ao navegar
+            if (window.innerWidth <= 768) {
+                toggleMobileMenu();
+            }
+        }
+
+        // SIDEBAR
+        function toggleSidebar() {
+            document.getElementById('sidebar').classList.toggle('collapsed');
+        }
+
+        function toggleMobileMenu() {
+            document.getElementById('sidebar').classList.toggle('show');
+            document.getElementById('mobileOverlay').classList.toggle('show');
+        }
+
+        // MODAIS
+        function openModal(modalId) {
+            document.getElementById(modalId).classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).classList.remove('active');
+            document.body.style.overflow = 'auto';
+        }
+
+        // TOAST NOTIFICATIONS
+        function showToast(type, title, message) {
+            const toastContainer = document.getElementById('toastContainer');
+            const toast = document.createElement('div');
+            toast.className = `toast toast-${type}`;
+            
+            const icons = {
+                success: '✅',
+                error: '❌',
+                info: 'ℹ️'
+            };
+            
+            toast.innerHTML = `
+                <div class="toast-icon">${icons[type]}</div>
+                <div class="toast-content">
+                    <div class="toast-title">${title}</div>
+                    <div class="toast-message">${message}</div>
+                </div>
+            `;
+            
+            toastContainer.appendChild(toast);
+            
+            setTimeout(() => {
+                toast.style.animation = 'slideInRight 0.3s ease reverse';
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
+
+        // COLABORADORES
+        function addColaborador() {
+            document.getElementById('formColaborador').reset();
+            openModal('modalColaborador');
+        }
+
+        document.getElementById('formColaborador').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const colaborador = {
+                id: 'colab_' + Date.now(),
+                nome: document.getElementById('colabNome').value,
+                cargo: document.getElementById('colabCargo').value,
+                status: document.getElementById('colabStatus').value,
+                loja: document.getElementById('colabLoja').value,
+                admissao: document.getElementById('colabAdmissao').value,
+                desligamento: document.getElementById('colabDesligamento').value || null,
+                lider: document.getElementById('colabLider').value,
+                regime: document.getElementById('colabRegime').value,
+                avaliacao: document.getElementById('colabAvaliacao').value,
+                email: document.getElementById('colabEmail').value,
+                telefone: document.getElementById('colabTelefone').value,
+                responsograma: document.getElementById('colabResponsograma').value,
+                perfilComportamental: document.getElementById('colabPerfilComportamental').value
+            };
+            
+            colaboradores.push(colaborador);
+            saveData();
+            renderDashboard();
+            renderColaboradores();
+            updateNavBadges();
+            closeModal('modalColaborador');
+            showToast('success', 'Colaborador Adicionado', `${colaborador.nome} foi cadastrado com sucesso!`);
+        });
+
+        function renderColaboradores() {
+            const tbody = document.getElementById('colaboradoresTableBody');
+            
+            if (colaboradores.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="8">
+                            <div class="table-empty">
+                                <div class="table-empty-icon">👥</div>
+                                <div class="table-empty-text">Nenhum colaborador encontrado</div>
+                                <div class="table-empty-subtext">Adicione colaboradores para começar a gerenciar sua equipe</div>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+            
+            tbody.innerHTML = colaboradores.map(c => {
+                // Verificar se está em onboarding (fase diferente de concluído)
+                const emOnboarding = onboardingProcessos.some(o => 
+                    o.colaboradorId === c.id && o.fase !== 'concluido'
+                );
+                const badgeOnboarding = emOnboarding ? '<span class="badge badge-info" style="margin-left: 8px;">🚀 Onboarding</span>' : '';
+                
+                return `
+                    <tr>
+                        <td><strong>${c.nome}</strong>${badgeOnboarding}</td>
+                        <td>${c.cargo}</td>
+                        <td>${c.loja}</td>
+                        <td><span class="badge badge-${c.status.toLowerCase().replace(' ', '-')}">${c.status}</span></td>
+                        <td>${formatDate(c.admissao)}</td>
+                        <td>${c.lider || '-'}</td>
+                        <td>${c.avaliacao || 'Não avaliado'}</td>
+                        <td>
+                            <div class="action-buttons">
+                                <button class="action-btn action-btn-view" onclick="viewColaborador('${c.id}')" title="Visualizar">👁️</button>
+                                <button class="action-btn action-btn-edit" onclick="editColaborador('${c.id}')" title="Editar">✏️</button>
+                                <button class="action-btn action-btn-delete" onclick="deleteColaborador('${c.id}')" title="Excluir">🗑️</button>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        function filterColaboradores() {
+            const search = document.getElementById('searchColaborador').value.toLowerCase();
+            const statusFilter = document.getElementById('filterStatus').value;
+            const onboardingFilter = document.getElementById('filterOnboarding').value;
+            
+            let filtered = colaboradores.filter(c => {
+                const matchesSearch = c.nome.toLowerCase().includes(search) ||
+                                    c.cargo.toLowerCase().includes(search) ||
+                                    c.loja.toLowerCase().includes(search);
+                const matchesStatus = !statusFilter || c.status === statusFilter;
+                
+                // Verificar se está em onboarding (fase diferente de concluído)
+                let matchesOnboarding = true;
+                if (onboardingFilter === 'onboarding') {
+                    const emOnboarding = onboardingProcessos.some(o => 
+                        o.colaboradorId === c.id && o.fase !== 'concluido'
+                    );
+                    matchesOnboarding = emOnboarding;
+                }
+                
+                return matchesSearch && matchesStatus && matchesOnboarding;
+            });
+            
+            const tbody = document.getElementById('colaboradoresTableBody');
+            if (filtered.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="8">
+                            <div class="table-empty">
+                                <div class="table-empty-icon">🔍</div>
+                                <div class="table-empty-text">Nenhum resultado encontrado</div>
+                                <div class="table-empty-subtext">Tente ajustar os filtros de busca</div>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+            
+            tbody.innerHTML = filtered.map(c => {
+                // Verificar se está em onboarding
+                const emOnboarding = onboardingProcessos.some(o => 
+                    o.colaboradorId === c.id && o.fase !== 'concluido'
+                );
+                const badgeOnboarding = emOnboarding ? '<span class="badge badge-info" style="margin-left: 8px;">🚀 Onboarding</span>' : '';
+                
+                return `
+                    <tr>
+                        <td><strong>${c.nome}</strong>${badgeOnboarding}</td>
+                        <td>${c.cargo}</td>
+                        <td>${c.loja}</td>
+                        <td><span class="badge badge-${c.status.toLowerCase()}">${c.status}</span></td>
+                        <td>${formatDate(c.admissao)}</td>
+                        <td>${c.lider || '-'}</td>
+                        <td>${c.avaliacao || 'Não avaliado'}</td>
+                        <td>
+                            <div class="action-buttons">
+                                <button class="action-btn action-btn-view" onclick="viewColaborador('${c.id}')">👁️</button>
+                                <button class="action-btn action-btn-edit" onclick="editColaborador('${c.id}')">✏️</button>
+                                <button class="action-btn action-btn-delete" onclick="deleteColaborador('${c.id}')">🗑️</button>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        function sortTable(column) {
+            if (currentSort.column === column) {
+                currentSort.direction = currentSort.direction === 'asc' ? 'desc' : 'asc';
+            } else {
+                currentSort.column = column;
+                currentSort.direction = 'asc';
+            }
+            
+            colaboradores.sort((a, b) => {
+                let aVal = a[column];
+                let bVal = b[column];
+                
+                if (column === 'admissao') {
+                    aVal = new Date(aVal);
+                    bVal = new Date(bVal);
+                }
+                
+                if (aVal < bVal) return currentSort.direction === 'asc' ? -1 : 1;
+                if (aVal > bVal) return currentSort.direction === 'asc' ? 1 : -1;
+                return 0;
+            });
+            
+            renderColaboradores();
+        }
+
+        function deleteColaborador(id) {
+            const colab = colaboradores.find(c => c.id === id);
+            if (confirm(`Tem certeza que deseja excluir ${colab.nome}?`)) {
+                colaboradores = colaboradores.filter(c => c.id !== id);
+                saveData();
+                renderColaboradores();
+                renderDashboard();
+                updateNavBadges();
+                showToast('success', 'Colaborador Removido', 'O colaborador foi excluído do sistema.');
+            }
+        }
+
+        function viewColaborador(id) {
+            const colab = colaboradores.find(c => c.id === id);
+            // Implementar visualização detalhada
+            showToast('info', 'Visualizar Colaborador', `Detalhes de ${colab.nome}`);
+        }
+
+        function editColaborador(id) {
+            // Implementar edição
+            showToast('info', 'Editar Colaborador', 'Função em desenvolvimento');
+        }
+
+        // RECRUTAMENTO
+        function addCandidato() {
+            document.getElementById('formRecrutamento').reset();
+            openModal('modalRecrutamento');
+        }
+
+        document.getElementById('formRecrutamento').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const editingId = this.dataset.editingId;
+            
+            if (editingId) {
+                // Editando candidato existente
+                const candidato = processosSeletivos.find(p => p.id === editingId);
+                if (candidato) {
+                    candidato.nome = document.getElementById('recNome').value;
+                    candidato.vaga = document.getElementById('recVaga').value;
+                    candidato.email = document.getElementById('recEmail').value;
+                    candidato.telefone = document.getElementById('recTelefone').value;
+                    candidato.fase = document.getElementById('recFase').value;
+                    candidato.data = document.getElementById('recData').value;
+                    candidato.observacoes = document.getElementById('recObs').value;
+                    
+                    showToast('success', 'Candidato Atualizado', `${candidato.nome} foi atualizado com sucesso.`);
+                }
+                delete this.dataset.editingId;
+                document.querySelector('#modalRecrutamento .modal-title').textContent = '🎯 Novo Processo Seletivo';
+            } else {
+                // Criando novo candidato
+                const candidato = {
+                    id: 'cand_' + Date.now(),
+                    nome: document.getElementById('recNome').value,
+                    vaga: document.getElementById('recVaga').value,
+                    email: document.getElementById('recEmail').value,
+                    telefone: document.getElementById('recTelefone').value,
+                    fase: document.getElementById('recFase').value,
+                    data: document.getElementById('recData').value,
+                    observacoes: document.getElementById('recObs').value
+                };
+                
+                processosSeletivos.push(candidato);
+                showToast('success', 'Candidato Adicionado', `${candidato.nome} foi adicionado ao processo seletivo.`);
+            }
+            
+            saveData();
+            renderRecrutamento();
+            renderDashboard();
+            updateNavBadges();
+            closeModal('modalRecrutamento');
+        });
+
+        function renderRecrutamento() {
+            // Renderizar tabela de gerenciamento
+            renderRecrutamentoTable();
+            
+            // Renderizar Kanban visual
+            const fases = {
+                triagem: [],
+                entrevista: [],
+                gestor: [],
+                aprovado: []
+            };
+            
+            processosSeletivos.forEach(p => {
+                fases[p.fase].push(p);
+            });
+            
+            Object.keys(fases).forEach(fase => {
+                const container = document.getElementById(`kanban-${fase}`);
+                const count = document.getElementById(`count-${fase}`);
+                count.textContent = fases[fase].length;
+                
+                if (fases[fase].length === 0) {
+                    container.innerHTML = '<div style="text-align: center; padding: 20px; color: var(--text-tertiary);">Nenhum candidato</div>';
+                    return;
+                }
+                
+                container.innerHTML = fases[fase].map(p => `
+                    <div class="kanban-card">
+                        <div class="kanban-card-title">${p.nome}</div>
+                        <div class="kanban-card-meta">
+                            <span>📋 ${p.vaga}</span>
+                            ${p.data ? `<span>📅 ${formatDate(p.data)}</span>` : ''}
+                        </div>
+                    </div>
+                `).join('');
+            });
+        }
+
+        function renderRecrutamentoTable() {
+            const tbody = document.getElementById('recrutamentoManageTable');
+            
+            if (processosSeletivos.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="7">
+                            <div class="table-empty">
+                                <div class="table-empty-icon">🎯</div>
+                                <div class="table-empty-text">Nenhum candidato cadastrado</div>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+            
+            const nomeFase = {
+                'triagem': '📝 Triagem',
+                'entrevista': '📞 Entrevista RH',
+                'gestor': '👔 Entrevista Gestor',
+                'aprovado': '✅ Aprovado'
+            };
+            
+            tbody.innerHTML = '';
+            
+            processosSeletivos.forEach(p => {
+                const tr = document.createElement('tr');
+                
+                // Determinar qual informação mostrar (compatível com formato antigo e novo)
+                const displayNome = p.nome || '-';
+                const displayVaga = p.vaga || p.cidadeCandidatura || '-';
+                const displayEmail = p.email || '-';
+                const displayTelefone = p.telefone || '-';
+                
+                tr.innerHTML = `
+                    <td><strong>${displayNome}</strong>${p.cidadeCandidatura ? `<br><small style="color: var(--text-tertiary);">${p.cidadeCandidatura}</small>` : ''}</td>
+                    <td>${displayVaga}</td>
+                    <td>${displayEmail}</td>
+                    <td>${displayTelefone}</td>
+                    <td><span class="badge badge-info">${nomeFase[p.fase]}</span></td>
+                    <td>${p.data ? formatDate(p.data) : '-'}</td>
+                    <td>
+                        <div class="action-buttons">
+                            <button class="action-btn action-btn-edit" title="Avançar fase">➡️</button>
+                            <button class="action-btn action-btn-view" title="Ver detalhes">👁️</button>
+                            <button class="action-btn action-btn-delete" title="Excluir">🗑️</button>
+                        </div>
+                    </td>
+                `;
+                
+                const botoes = tr.querySelectorAll('button');
+                const btnAvancar = botoes[0];
+                const btnVer = botoes[1];
+                const btnExcluir = botoes[2];
+                
+                btnAvancar.addEventListener('click', () => {
+                    avancarCandidato(p.id);
+                });
+                
+                btnVer.addEventListener('click', () => {
+                    verDetalhesCandidato(p.id);
+                });
+                
+                btnExcluir.addEventListener('click', () => {
+                    excluirCandidato(p.id);
+                });
+                
+                tbody.appendChild(tr);
+            });
+        }
+
+        function verDetalhesCandidato(id) {
+            const candidato = processosSeletivos.find(p => p.id === id);
+            if (!candidato) return;
+            
+            let detalhes = `
+                <div style="padding: 20px;">
+                    <h3 style="margin-bottom: 20px; color: var(--primary);">📋 Detalhes do Candidato</h3>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+                        <div><strong>Nome:</strong> ${candidato.nome || '-'}</div>
+                        <div><strong>Data Nascimento:</strong> ${candidato.dataNascimento || '-'}</div>
+                        <div><strong>Sexo:</strong> ${candidato.sexo || '-'}</div>
+                        <div><strong>Telefone:</strong> ${candidato.telefone || '-'}</div>
+                        <div><strong>Estado Civil:</strong> ${candidato.estadoCivil || '-'}</div>
+                        <div><strong>Cidade:</strong> ${candidato.cidade || '-'}</div>
+                        <div><strong>Bairro:</strong> ${candidato.bairro || '-'}</div>
+                        <div><strong>Escolaridade:</strong> ${candidato.escolaridade || '-'}</div>
+                        <div><strong>Como Soube:</strong> ${candidato.comoSoube || '-'}</div>
+                        <div><strong>Cidade Candidatura:</strong> ${candidato.cidadeCandidatura || '-'}</div>
+                        <div><strong>Disponibilidade:</strong> ${candidato.disponibilidade || '-'}</div>
+                        <div><strong>Experiência Vendas:</strong> ${candidato.experienciaVendas || '-'}</div>
+                        ${candidato.tempoExperiencia ? `<div style="grid-column: 1/-1;"><strong>Tempo Experiência:</strong> ${candidato.tempoExperiencia}</div>` : ''}
+                    </div>
+                    ${candidato.porqueGardeni ? `
+                        <div style="margin-top: 20px;">
+                            <strong>Por que quer trabalhar na Gardeni:</strong><br>
+                            <p style="margin-top: 8px; padding: 12px; background: var(--bg-secondary); border-radius: var(--radius-md);">${candidato.porqueGardeni}</p>
+                        </div>
+                    ` : ''}
+                    ${candidato.curriculoLink ? `
+                        <div style="margin-top: 20px;">
+                            <strong>Currículo:</strong><br>
+                            <a href="${candidato.curriculoLink}" target="_blank" style="color: var(--primary); text-decoration: underline;">📄 Abrir Currículo</a>
+                        </div>
+                    ` : ''}
+                </div>
+            `;
+            
+            // Criar modal temporário
+            const modalTemp = document.createElement('div');
+            modalTemp.className = 'modal active';
+            modalTemp.innerHTML = `
+                <div class="modal-content" style="max-width: 800px;">
+                    ${detalhes}
+                    <div style="padding: 20px; border-top: 2px solid var(--border); text-align: right;">
+                        <button class="btn btn-primary" onclick="this.closest('.modal').remove()">Fechar</button>
+                    </div>
+                </div>
+            `;
+            
+            modalTemp.addEventListener('click', (e) => {
+                if (e.target === modalTemp) {
+                    modalTemp.remove();
+                }
+            });
+            
+            document.body.appendChild(modalTemp);
+        }
+
+        function avancarCandidato(id) {
+            const candidato = processosSeletivos.find(p => p.id === id);
+            if (!candidato) return;
+            
+            const fasesOrdem = ['triagem', 'entrevista', 'gestor', 'aprovado'];
+            const indiceAtual = fasesOrdem.indexOf(candidato.fase);
+            
+            if (indiceAtual < fasesOrdem.length - 1) {
+                candidato.fase = fasesOrdem[indiceAtual + 1];
+                saveData();
+                renderRecrutamento();
+                renderDashboard();
+                updateNavBadges();
+                
+                const nomeFase = {
+                    'triagem': 'Triagem',
+                    'entrevista': 'Entrevista RH',
+                    'gestor': 'Entrevista Gestor',
+                    'aprovado': 'Aprovado'
+                };
+                
+                showToast('success', 'Candidato Avançado', `${candidato.nome} movido para: ${nomeFase[candidato.fase]}`);
+            } else {
+                showToast('info', 'Processo Finalizado', `${candidato.nome} já está aprovado.`);
+            }
+        }
+
+        function editarCandidato(id) {
+            const candidato = processosSeletivos.find(p => p.id === id);
+            if (!candidato) return;
+            
+            document.getElementById('recNome').value = candidato.nome;
+            document.getElementById('recVaga').value = candidato.vaga;
+            document.getElementById('recEmail').value = candidato.email || '';
+            document.getElementById('recTelefone').value = candidato.telefone || '';
+            document.getElementById('recFase').value = candidato.fase;
+            document.getElementById('recData').value = candidato.data || '';
+            document.getElementById('recObs').value = candidato.observacoes || '';
+            
+            document.getElementById('formRecrutamento').dataset.editingId = id;
+            document.querySelector('#modalRecrutamento .modal-title').textContent = '✏️ Editar Candidato';
+            
+            openModal('modalRecrutamento');
+        }
+
+        function excluirCandidato(id) {
+            const candidato = processosSeletivos.find(p => p.id === id);
+            if (!candidato) return;
+            
+            if (confirm(`Deseja realmente EXCLUIR o candidato ${candidato.nome}?\n\nEsta ação não pode ser desfeita!`)) {
+                processosSeletivos = processosSeletivos.filter(p => p.id !== id);
+                saveData();
+                renderRecrutamento();
+                renderDashboard();
+                updateNavBadges();
+                showToast('success', 'Candidato Excluído', `${candidato.nome} foi removido do processo seletivo.`);
+            }
+        }
+
+        function filtrarCandidatos() {
+            const search = document.getElementById('searchCandidato').value.toLowerCase();
+            const filtered = processosSeletivos.filter(p => 
+                p.nome.toLowerCase().includes(search) ||
+                p.vaga.toLowerCase().includes(search) ||
+                (p.email && p.email.toLowerCase().includes(search))
+            );
+            
+            const tbody = document.getElementById('recrutamentoManageTable');
+            if (filtered.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="7">
+                            <div class="table-empty">
+                                <div class="table-empty-icon">🔍</div>
+                                <div class="table-empty-text">Nenhum candidato encontrado</div>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+            
+            const nomeFase = {
+                'triagem': '📝 Triagem',
+                'entrevista': '📞 Entrevista RH',
+                'gestor': '👔 Entrevista Gestor',
+                'aprovado': '✅ Aprovado'
+            };
+            
+            tbody.innerHTML = '';
+            filtered.forEach(p => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td><strong>${p.nome}</strong></td>
+                    <td>${p.vaga}</td>
+                    <td>${p.email || '-'}</td>
+                    <td>${p.telefone || '-'}</td>
+                    <td><span class="badge badge-info">${nomeFase[p.fase]}</span></td>
+                    <td>${p.data ? formatDate(p.data) : '-'}</td>
+                    <td>
+                        <div class="action-buttons">
+                            <button class="action-btn action-btn-edit" title="Avançar">➡️</button>
+                            <button class="action-btn action-btn-view" title="Editar">✏️</button>
+                            <button class="action-btn action-btn-delete" title="Excluir">🗑️</button>
+                        </div>
+                    </td>
+                `;
+                
+                const botoes = tr.querySelectorAll('button');
+                botoes[0].addEventListener('click', () => avancarCandidato(p.id));
+                botoes[1].addEventListener('click', () => editarCandidato(p.id));
+                botoes[2].addEventListener('click', () => excluirCandidato(p.id));
+                
+                tbody.appendChild(tr);
+            });
+        }
+
+        // ONBOARDING
+        function addOnboarding() {
+            // Atualizar lista de colaboradores disponíveis
+            const select = document.getElementById('onbColaboradorId');
+            select.innerHTML = '<option value="">Selecione um colaborador...</option>';
+            
+            // Filtrar apenas colaboradores ativos sem onboarding ativo
+            const colaboradoresDisponiveis = colaboradores.filter(c => {
+                const emOnboarding = onboardingProcessos.some(o => 
+                    o.colaboradorId === c.id && o.fase !== 'concluido'
+                );
+                return c.status === 'Ativo' && !emOnboarding;
+            });
+            
+            colaboradoresDisponiveis.forEach(c => {
+                const option = document.createElement('option');
+                option.value = c.id;
+                option.textContent = `${c.nome} - ${c.cargo} (${c.loja})`;
+                select.appendChild(option);
+            });
+            
+            if (colaboradoresDisponiveis.length === 0) {
+                showToast('info', 'Nenhum Colaborador Disponível', 'Todos os colaboradores ativos já estão em processo de onboarding.');
+                return;
+            }
+            
+            document.getElementById('formOnboarding').reset();
+            document.getElementById('onbInicio').value = new Date().toISOString().split('T')[0];
+            
+            // Resetar título e esconder botão de excluir
+            document.querySelector('#modalOnboarding .modal-title').textContent = '🚀 Iniciar Processo de Integração';
+            document.getElementById('btnExcluirOnboarding').style.display = 'none';
+            delete document.getElementById('formOnboarding').dataset.editingId;
+            
+            openModal('modalOnboarding');
+        }
+
+        function preencherDadosColaborador() {
+            const colaboradorId = document.getElementById('onbColaboradorId').value;
+            if (!colaboradorId) {
+                document.getElementById('onbCargo').value = '';
+                document.getElementById('onbLoja').value = '';
+                return;
+            }
+            
+            const colaborador = colaboradores.find(c => c.id === colaboradorId);
+            if (colaborador) {
+                document.getElementById('onbCargo').value = colaborador.cargo;
+                document.getElementById('onbLoja').value = colaborador.loja;
+            }
+        }
+
+        document.getElementById('formOnboarding').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const colaboradorId = document.getElementById('onbColaboradorId').value;
+            const colaborador = colaboradores.find(c => c.id === colaboradorId);
+            
+            if (!colaborador) {
+                showToast('error', 'Erro', 'Colaborador não encontrado.');
+                return;
+            }
+            
+            const editingId = this.dataset.editingId;
+            
+            if (editingId) {
+                // Editando processo existente
+                const onboarding = onboardingProcessos.find(o => o.id === editingId);
+                if (onboarding) {
+                    onboarding.colaboradorId = colaborador.id;
+                    onboarding.nome = colaborador.nome;
+                    onboarding.cargo = colaborador.cargo;
+                    onboarding.loja = colaborador.loja;
+                    onboarding.inicio = document.getElementById('onbInicio').value;
+                    onboarding.responsavel = document.getElementById('onbResponsavel').value;
+                    onboarding.fase = document.getElementById('onbFase').value;
+                    onboarding.observacoes = document.getElementById('onbObservacoes').value;
+                    
+                    showToast('success', 'Onboarding Atualizado', `Processo de ${onboarding.nome} foi atualizado.`);
+                }
+                delete this.dataset.editingId;
+            } else {
+                // Criando novo processo
+                const onboarding = {
+                    id: 'onb_' + Date.now(),
+                    colaboradorId: colaborador.id,
+                    nome: colaborador.nome,
+                    cargo: colaborador.cargo,
+                    loja: colaborador.loja,
+                    inicio: document.getElementById('onbInicio').value,
+                    responsavel: document.getElementById('onbResponsavel').value,
+                    fase: document.getElementById('onbFase').value,
+                    observacoes: document.getElementById('onbObservacoes').value,
+                    criadoEm: new Date().toISOString()
+                };
+                
+                onboardingProcessos.push(onboarding);
+                showToast('success', 'Onboarding Iniciado', `Processo de integração de ${onboarding.nome} foi iniciado.`);
+            }
+            
+            saveData();
+            renderOnboarding();
+            renderDashboard();
+            renderColaboradores();
+            closeModal('modalOnboarding');
+            
+            // Resetar título do modal e esconder botão de excluir
+            document.querySelector('#modalOnboarding .modal-title').textContent = '🚀 Iniciar Processo de Integração';
+            document.getElementById('btnExcluirOnboarding').style.display = 'none';
+        });
+
+        function renderOnboarding() {
+            // Renderizar tabela de gerenciamento
+            renderOnboardingTable();
+            
+            // Renderizar Kanban visual
+            const fases = {
+                documentacao: [],
+                treinamento: [],
+                integracao: [],
+                atividade: [],
+                concluido: []
+            };
+            
+            // Organizar por fase
+            onboardingProcessos.forEach(o => {
+                if (fases[o.fase]) {
+                    fases[o.fase].push(o);
+                }
+            });
+            
+            // Renderizar cada coluna do Kanban (apenas visual)
+            Object.keys(fases).forEach(fase => {
+                const container = document.getElementById(`kanban-${fase}`);
+                const count = document.getElementById(`count-${fase}`);
+                count.textContent = fases[fase].length;
+                
+                container.innerHTML = '';
+                
+                if (fases[fase].length === 0) {
+                    container.innerHTML = '<div style="text-align: center; padding: 20px; color: var(--text-tertiary); font-size: 13px;">Nenhum colaborador</div>';
+                    return;
+                }
+                
+                fases[fase].forEach(o => {
+                    const dataInicio = new Date(o.inicio);
+                    const hoje = new Date();
+                    const diasDecorridos = Math.floor((hoje - dataInicio) / (1000 * 60 * 60 * 24));
+                    
+                    const card = document.createElement('div');
+                    card.className = 'kanban-card';
+                    card.style.cursor = 'default';
+                    
+                    card.innerHTML = `
+                        <div class="kanban-card-title">${o.nome}</div>
+                        <div class="kanban-card-meta">
+                            <span>💼 ${o.cargo}</span>
+                        </div>
+                        <div class="kanban-card-meta" style="margin-top: 8px;">
+                            <span>👤 ${o.responsavel}</span>
+                            <span>📅 ${diasDecorridos} dias</span>
+                        </div>
+                    `;
+                    
+                    container.appendChild(card);
+                });
+            });
+        }
+
+        function renderOnboardingTable() {
+            const tbody = document.getElementById('onboardingManageTable');
+            
+            if (onboardingProcessos.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="6">
+                            <div class="table-empty">
+                                <div class="table-empty-icon">🚀</div>
+                                <div class="table-empty-text">Nenhum processo ativo</div>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+            
+            const nomeFase = {
+                'documentacao': '📋 Documentação',
+                'treinamento': '🎓 Treinamento',
+                'integracao': '🤝 Integração',
+                'atividade': '⚡ Atividade',
+                'concluido': '✅ Concluído'
+            };
+            
+            tbody.innerHTML = '';
+            
+            onboardingProcessos.forEach(o => {
+                const dataInicio = new Date(o.inicio);
+                const hoje = new Date();
+                const diasDecorridos = Math.floor((hoje - dataInicio) / (1000 * 60 * 60 * 24));
+                
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td><strong>${o.nome}</strong></td>
+                    <td>${o.cargo}</td>
+                    <td><span class="badge badge-info">${nomeFase[o.fase]}</span></td>
+                    <td>${o.responsavel}</td>
+                    <td>${diasDecorridos} dias</td>
+                    <td>
+                        <div class="action-buttons">
+                            <button class="action-btn action-btn-edit" title="Avançar fase">➡️</button>
+                            <button class="action-btn action-btn-view" title="Editar">✏️</button>
+                            <button class="action-btn action-btn-delete" title="Excluir">🗑️</button>
+                        </div>
+                    </td>
+                `;
+                
+                // Pegar os botões
+                const botoes = tr.querySelectorAll('button');
+                const btnAvancar = botoes[0];
+                const btnEditar = botoes[1];
+                const btnExcluir = botoes[2];
+                
+                // Adicionar eventos
+                btnAvancar.addEventListener('click', () => {
+                    moverOnboarding(o.id);
+                });
+                
+                btnEditar.addEventListener('click', () => {
+                    editarOnboarding(o.id);
+                });
+                
+                btnExcluir.addEventListener('click', () => {
+                    excluirOnboardingDireto(o.id);
+                });
+                
+                tbody.appendChild(tr);
+            });
+        }
+
+        function excluirOnboardingDireto(id) {
+            const onboarding = onboardingProcessos.find(o => o.id === id);
+            if (!onboarding) {
+                alert('Erro: Processo não encontrado!');
+                return;
+            }
+            
+            const confirmacao = confirm(
+                `EXCLUIR PROCESSO DE ONBOARDING\n\n` +
+                `Colaborador: ${onboarding.nome}\n` +
+                `Cargo: ${onboarding.cargo}\n` +
+                `Fase: ${onboarding.fase}\n\n` +
+                `⚠️ O colaborador NÃO será excluído!\n` +
+                `Apenas o processo de integração será removido.\n\n` +
+                `Confirma a exclusão?`
+            );
+            
+            if (confirmacao) {
+                console.log('Excluindo onboarding:', id);
+                console.log('Array antes:', onboardingProcessos.length);
+                
+                const nomeSalvo = onboarding.nome;
+                onboardingProcessos = onboardingProcessos.filter(o => o.id !== id);
+                
+                console.log('Array depois:', onboardingProcessos.length);
+                
+                saveData();
+                renderOnboarding();
+                renderDashboard();
+                renderColaboradores();
+                
+                showToast('success', 'Excluído com Sucesso', `Processo de ${nomeSalvo} foi removido!`);
+            }
+        }
+
+        function editarOnboarding(id) {
+            const onboarding = onboardingProcessos.find(o => o.id === id);
+            if (!onboarding) {
+                showToast('error', 'Erro', 'Processo não encontrado.');
+                return;
+            }
+            
+            // Preencher modal com dados atuais
+            const select = document.getElementById('onbColaboradorId');
+            select.innerHTML = '<option value="">Selecione um colaborador...</option>';
+            
+            // Adicionar todos os colaboradores ativos
+            colaboradores.filter(c => c.status === 'Ativo').forEach(c => {
+                const option = document.createElement('option');
+                option.value = c.id;
+                option.textContent = `${c.nome} - ${c.cargo} (${c.loja})`;
+                if (c.id === onboarding.colaboradorId) {
+                    option.selected = true;
+                }
+                select.appendChild(option);
+            });
+            
+            document.getElementById('onbCargo').value = onboarding.cargo;
+            document.getElementById('onbLoja').value = onboarding.loja;
+            document.getElementById('onbInicio').value = onboarding.inicio;
+            document.getElementById('onbResponsavel').value = onboarding.responsavel;
+            document.getElementById('onbFase').value = onboarding.fase;
+            document.getElementById('onbObservacoes').value = onboarding.observacoes || '';
+            
+            // Marcar que estamos editando
+            document.getElementById('formOnboarding').dataset.editingId = id;
+            document.querySelector('#modalOnboarding .modal-title').textContent = '✏️ Editar Processo de Integração';
+            
+            // Mostrar botão de excluir e configurar evento
+            const btnExcluir = document.getElementById('btnExcluirOnboarding');
+            btnExcluir.style.display = 'block';
+            
+            // Remover listeners antigos e adicionar novo
+            const novoBtnExcluir = btnExcluir.cloneNode(true);
+            btnExcluir.parentNode.replaceChild(novoBtnExcluir, btnExcluir);
+            
+            novoBtnExcluir.onclick = function() {
+                if (confirm(`Deseja realmente EXCLUIR o processo de onboarding de ${onboarding.nome}?\n\nO colaborador NÃO será excluído do sistema.\n\nEsta ação não pode ser desfeita!`)) {
+                    onboardingProcessos = onboardingProcessos.filter(o => o.id !== id);
+                    saveData();
+                    renderOnboarding();
+                    renderDashboard();
+                    renderColaboradores();
+                    closeModal('modalOnboarding');
+                    showToast('success', 'Processo Excluído', `Onboarding de ${onboarding.nome} foi removido com sucesso!`);
+                    
+                    // Resetar modal
+                    delete document.getElementById('formOnboarding').dataset.editingId;
+                    document.querySelector('#modalOnboarding .modal-title').textContent = '🚀 Iniciar Processo de Integração';
+                    document.getElementById('btnExcluirOnboarding').style.display = 'none';
+                }
+            };
+            
+            openModal('modalOnboarding');
+        }
+
+        function moverOnboarding(id) {
+            const onboarding = onboardingProcessos.find(o => o.id === id);
+            if (!onboarding) {
+                showToast('error', 'Erro', 'Processo não encontrado.');
+                return;
+            }
+            
+            const fasesOrdem = ['documentacao', 'treinamento', 'integracao', 'atividade', 'concluido'];
+            const indiceAtual = fasesOrdem.indexOf(onboarding.fase);
+            
+            if (indiceAtual < fasesOrdem.length - 1) {
+                onboarding.fase = fasesOrdem[indiceAtual + 1];
+                saveData();
+                renderOnboarding();
+                renderColaboradores();
+                renderDashboard();
+                
+                const nomeFase = {
+                    'documentacao': 'Documentação',
+                    'treinamento': 'Treinamento Inicial',
+                    'integracao': 'Integração com Time',
+                    'atividade': 'Em Atividade',
+                    'concluido': 'Concluído'
+                };
+                
+                showToast('success', 'Fase Atualizada', `${onboarding.nome} movido para: ${nomeFase[onboarding.fase]}`);
+            } else {
+                showToast('info', 'Onboarding Completo', `${onboarding.nome} já está na fase final.`);
+            }
+        }
+
+        function removerOnboarding(id) {
+            const onboarding = onboardingProcessos.find(o => o.id === id);
+            if (!onboarding) {
+                showToast('error', 'Erro', 'Processo não encontrado.');
+                return;
+            }
+            
+            if (confirm(`Deseja realmente remover o processo de onboarding de ${onboarding.nome}?\n\nO colaborador NÃO será excluído do sistema.`)) {
+                const nomeColab = onboarding.nome;
+                onboardingProcessos = onboardingProcessos.filter(o => o.id !== id);
+                saveData();
+                renderOnboarding();
+                renderDashboard();
+                renderColaboradores();
+                showToast('success', 'Processo Removido', `Onboarding de ${nomeColab} foi removido com sucesso!`);
+            }
+        }
+
+        // Drag and Drop
+        let draggedElement = null;
+
+        function setupDropZones() {
+            const columns = document.querySelectorAll('.kanban-cards');
+            
+            columns.forEach(column => {
+                column.addEventListener('dragover', (e) => {
+                    e.preventDefault();
+                    column.style.background = 'rgba(102, 126, 234, 0.1)';
+                });
+                
+                column.addEventListener('dragleave', (e) => {
+                    column.style.background = '';
+                });
+                
+                column.addEventListener('drop', (e) => {
+                    e.preventDefault();
+                    column.style.background = '';
+                    
+                    if (draggedElement) {
+                        const onboardingId = draggedElement.dataset.onboardingId;
+                        const novaFase = column.id.replace('kanban-', '');
+                        
+                        const onboarding = onboardingProcessos.find(o => o.id === onboardingId);
+                        if (onboarding && onboarding.fase !== novaFase) {
+                            onboarding.fase = novaFase;
+                            saveData();
+                            renderOnboarding();
+                            renderColaboradores();
+                            
+                            const nomeFase = {
+                                'documentacao': 'Documentação',
+                                'treinamento': 'Treinamento Inicial',
+                                'integracao': 'Integração com Time',
+                                'atividade': 'Em Atividade',
+                                'concluido': 'Concluído'
+                            };
+                            
+                            showToast('success', 'Fase Atualizada', `${onboarding.nome} movido para: ${nomeFase[novaFase]}`);
+                        }
+                        
+                        draggedElement = null;
+                    }
+                });
+            });
+        }
+
+        // TREINAMENTOS
+        function addTreinamento() {
+            document.getElementById('formTreinamento').reset();
+            openModal('modalTreinamento');
+        }
+
+        document.getElementById('formTreinamento').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const treinamento = {
+                id: 'trein_' + Date.now(),
+                nome: document.getElementById('treinNome').value,
+                categoria: document.getElementById('treinCategoria').value,
+                data: document.getElementById('treinData').value,
+                duracao: document.getElementById('treinDuracao').value,
+                participantes: document.getElementById('treinParticipantes').value,
+                instrutor: document.getElementById('treinInstrutor').value,
+                status: document.getElementById('treinStatus').value,
+                descricao: document.getElementById('treinDescricao').value
+            };
+            
+            treinamentos.push(treinamento);
+            saveData();
+            renderTreinamentos();
+            renderDashboard();
+            closeModal('modalTreinamento');
+            showToast('success', 'Treinamento Cadastrado', `${treinamento.nome} foi adicionado ao calendário.`);
+        });
+
+        function renderTreinamentos() {
+            const tbody = document.getElementById('treinamentosTableBody');
+            
+            if (treinamentos.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="8">
+                            <div class="table-empty">
+                                <div class="table-empty-icon">📚</div>
+                                <div class="table-empty-text">Nenhum treinamento cadastrado</div>
+                                <div class="table-empty-subtext">Adicione treinamentos para desenvolver sua equipe</div>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+            
+            tbody.innerHTML = treinamentos.map(t => `
+                <tr>
+                    <td><strong>${t.nome}</strong></td>
+                    <td><span class="badge badge-info">${t.categoria}</span></td>
+                    <td>${formatDate(t.data)}</td>
+                    <td>${t.duracao || '-'}h</td>
+                    <td>${t.participantes || '-'}</td>
+                    <td>${t.instrutor || '-'}</td>
+                    <td><span class="badge badge-${t.status === 'Concluído' ? 'success' : t.status === 'Em andamento' ? 'info' : 'warning'}">${t.status}</span></td>
+                    <td>
+                        <div class="action-buttons">
+                            <button class="action-btn action-btn-view">👁️</button>
+                            <button class="action-btn action-btn-edit">✏️</button>
+                            <button class="action-btn action-btn-delete">🗑️</button>
+                        </div>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        // CALENDÁRIO
+        function addEvento() {
+            document.getElementById('formEvento').reset();
+            openModal('modalEvento');
+        }
+
+        document.getElementById('formEvento').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const evento = {
+                id: 'evt_' + Date.now(),
+                titulo: document.getElementById('eventoTitulo').value,
+                data: document.getElementById('eventoData').value,
+                categoria: document.getElementById('eventoCategoria').value,
+                descricao: document.getElementById('eventoDescricao').value
+            };
+            
+            eventosCalendario.push(evento);
+            saveData();
+            renderCalendario();
+            closeModal('modalEvento');
+            showToast('success', 'Evento Adicionado', `${evento.titulo} foi adicionado ao calendário.`);
+        });
+
+        function renderCalendario() {
+            const meses = [
+                'Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho',
+                'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'
+            ];
+            
+            const grid = document.getElementById('calendarGrid');
+            grid.innerHTML = meses.map((mes, index) => {
+                const mesNum = (index + 1).toString().padStart(2, '0');
+                const eventosMes = eventosCalendario.filter(e => e.data.startsWith(`2026-${mesNum}`));
+                
+                return `
+                    <div class="month-card">
+                        <div class="month-name">${mes} 2026</div>
+                        ${eventosMes.length > 0 ? `
+                            <ul class="month-events">
+                                ${eventosMes.map(e => `
+                                    <li>
+                                        <span class="event-date">${e.data.split('-')[2]}/${mesNum}</span>
+                                        ${e.categoria} - ${e.titulo}
+                                    </li>
+                                `).join('')}
+                            </ul>
+                        ` : '<p style="color: var(--text-tertiary); font-size: 13px; margin-top: 12px; text-align: center;">Sem eventos programados</p>'}
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // DASHBOARD
+        function renderDashboard() {
+            document.getElementById('totalColaboradores').textContent = colaboradores.length;
+            document.getElementById('totalProcessos').textContent = processosSeletivos.length;
+            
+            // Contar onboardings ativos (não concluídos)
+            const onboardingAtivos = onboardingProcessos.filter(o => o.fase !== 'concluido').length;
+            document.getElementById('totalOnboarding').textContent = onboardingAtivos;
+            
+            const hoje = new Date();
+            const treinamentosMes = treinamentos.filter(t => {
+                const dataEvento = new Date(t.data);
+                return dataEvento.getMonth() === hoje.getMonth() && dataEvento.getFullYear() === hoje.getFullYear();
+            });
+            document.getElementById('totalTreinamentos').textContent = treinamentosMes.length;
+            
+            const tbody = document.getElementById('recentColaboradoresBody');
+            const ultimos = colaboradores.slice(-5).reverse();
+            
+            if (ultimos.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="5">
+                            <div class="table-empty">
+                                <div class="table-empty-icon">👥</div>
+                                <div class="table-empty-text">Nenhum colaborador cadastrado</div>
+                                <div class="table-empty-subtext">Comece adicionando seu primeiro colaborador</div>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+            
+            tbody.innerHTML = ultimos.map(c => `
+                <tr>
+                    <td><strong>${c.nome}</strong></td>
+                    <td>${c.cargo}</td>
+                    <td>${c.loja}</td>
+                    <td><span class="badge badge-${c.status.toLowerCase()}">${c.status}</span></td>
+                    <td>${formatDate(c.admissao)}</td>
+                </tr>
+            `).join('');
+        }
+
+        function updateNavBadges() {
+            document.getElementById('navBadgeColaboradores').textContent = colaboradores.length;
+            document.getElementById('navBadgeRecrutamento').textContent = processosSeletivos.length;
+        }
+
+        // UTILITÁRIOS
+        function formatDate(dateStr) {
+            if (!dateStr) return '-';
+            const date = new Date(dateStr + 'T00:00:00');
+            return date.toLocaleDateString('pt-BR');
+        }
+
+        function saveData() {
+            localStorage.setItem('rhColaboradores', JSON.stringify(colaboradores));
+            localStorage.setItem('rhProcessosSeletivos', JSON.stringify(processosSeletivos));
+            localStorage.setItem('rhOnboarding', JSON.stringify(onboardingProcessos));
+            localStorage.setItem('rhTreinamentos', JSON.stringify(treinamentos));
+            localStorage.setItem('rhEventos', JSON.stringify(eventosCalendario));
+        }
+
+        function loadData() {
+            colaboradores = JSON.parse(localStorage.getItem('rhColaboradores') || '[]');
+            processosSeletivos = JSON.parse(localStorage.getItem('rhProcessosSeletivos') || '[]');
+            onboardingProcessos = JSON.parse(localStorage.getItem('rhOnboarding') || '[]');
+            treinamentos = JSON.parse(localStorage.getItem('rhTreinamentos') || '[]');
+            eventosCalendario = JSON.parse(localStorage.getItem('rhEventos') || '[]');
+        }
+
+        function exportAllData() {
+            const allData = {
+                colaboradores,
+                processosSeletivos,
+                onboardingProcessos,
+                treinamentos,
+                eventosCalendario,
+                exportDate: new Date().toISOString()
+            };
+            
+            const dataStr = JSON.stringify(allData, null, 2);
+            const dataBlob = new Blob([dataStr], {type: 'application/json'});
+            const url = URL.createObjectURL(dataBlob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = 'rh_sistema_backup_' + new Date().toISOString().split('T')[0] + '.json';
+            link.click();
+            URL.revokeObjectURL(url);
+            showToast('success', 'Dados Exportados', 'Backup realizado com sucesso!');
+        }
+
+        // SISTEMA DE LINKS DE CADASTRO
+        function gerarLinkCadastro() {
+            const baseUrl = window.location.href.split('?')[0];
+            const token = 'cadastro_' + Date.now();
+            const linkCompleto = `${baseUrl}?modo=cadastro&token=${token}`;
+            
+            document.getElementById('linkGerado').value = linkCompleto;
+            openModal('modalLinkCadastro');
+            
+            let tokensValidos = JSON.parse(localStorage.getItem('tokensValidos') || '[]');
+            tokensValidos.push({
+                token: token,
+                gerado: new Date().toISOString(),
+                usado: false
+            });
+            localStorage.setItem('tokensValidos', JSON.stringify(tokensValidos));
+        }
+
+        function copiarLink() {
+            const linkInput = document.getElementById('linkGerado');
+            linkInput.select();
+            linkInput.setSelectionRange(0, 99999);
+            
+            navigator.clipboard.writeText(linkInput.value).then(() => {
+                document.getElementById('linkCopiado').style.display = 'block';
+                setTimeout(() => {
+                    document.getElementById('linkCopiado').style.display = 'none';
+                }, 3000);
+            });
+        }
+
+        function verificarLinkCadastro() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const modo = urlParams.get('modo');
+            const token = urlParams.get('token');
+            
+            if (modo === 'cadastro' && token) {
+                let tokensValidos = JSON.parse(localStorage.getItem('tokensValidos') || '[]');
+                const tokenObj = tokensValidos.find(t => t.token === token);
+                
+                if (tokenObj && !tokenObj.usado) {
+                    mostrarFormularioCadastroPublico(token);
+                } else if (tokenObj && tokenObj.usado) {
+                    showToast('error', 'Link Inválido', 'Este link de cadastro já foi utilizado.');
+                } else {
+                    showToast('error', 'Link Inválido', 'Link de cadastro inválido ou expirado.');
+                }
+            }
+        }
+
+        function mostrarFormularioCadastroPublico(token) {
+            document.querySelector('.sidebar').style.display = 'none';
+            document.querySelector('.header').style.display = 'none';
+            document.querySelector('.content-area').style.padding = '0';
+            
+            openModal('modalCadastroPublico');
+            document.getElementById('formCadastroPublico').dataset.token = token;
+        }
+
+        document.getElementById('formCadastroPublico').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const token = this.dataset.token;
+            
+            const novoColaborador = {
+                id: 'colab_' + Date.now(),
+                nome: document.getElementById('pubNome').value,
+                cargo: document.getElementById('pubCargo').value,
+                status: 'Ativo',
+                loja: document.getElementById('pubLoja').value,
+                admissao: document.getElementById('pubAdmissao').value,
+                lider: document.getElementById('pubLider').value,
+                regime: document.getElementById('pubRegime').value,
+                avaliacao: '',
+                email: document.getElementById('pubEmail').value,
+                telefone: document.getElementById('pubTelefone').value,
+                responsograma: document.getElementById('pubResponsograma').value,
+                perfilComportamental: document.getElementById('pubPerfil').value,
+                cadastradoEm: new Date().toISOString(),
+                cadastroPorLink: true
+            };
+            
+            colaboradores.push(novoColaborador);
+            saveData();
+            
+            let tokensValidos = JSON.parse(localStorage.getItem('tokensValidos') || '[]');
+            const tokenObj = tokensValidos.find(t => t.token === token);
+            if (tokenObj) {
+                tokenObj.usado = true;
+                tokenObj.usadoEm = new Date().toISOString();
+            }
+            localStorage.setItem('tokensValidos', JSON.stringify(tokensValidos));
+            
+            const onboarding = {
+                id: 'onb_' + Date.now(),
+                colaboradorId: novoColaborador.id,
+                nome: novoColaborador.nome,
+                cargo: novoColaborador.cargo,
+                loja: novoColaborador.loja,
+                inicio: novoColaborador.admissao,
+                responsavel: novoColaborador.lider || 'A definir',
+                fase: 'documentacao',
+                observacoes: 'Criado automaticamente via link de cadastro',
+                criadoEm: new Date().toISOString()
+            };
+            onboardingProcessos.push(onboarding);
+            saveData();
+            
+            closeModal('modalCadastroPublico');
+            
+            const modalSucesso = document.createElement('div');
+            modalSucesso.className = 'modal active';
+            modalSucesso.innerHTML = `
+                <div class="modal-content" style="max-width: 500px; text-align: center;">
+                    <div style="font-size: 72px; margin-bottom: 24px;">🎉</div>
+                    <h2 style="color: var(--success); margin-bottom: 16px; font-size: 28px;">Cadastro Realizado!</h2>
+                    <p style="color: var(--text-secondary); font-size: 16px; margin-bottom: 24px; line-height: 1.6;">
+                        Bem-vindo(a), <strong>${novoColaborador.nome}</strong>!<br>
+                        Seus dados foram registrados com sucesso no sistema.
+                    </p>
+                    <p style="color: var(--text-tertiary); font-size: 14px; margin-bottom: 32px;">
+                        O RH entrará em contato em breve para os próximos passos da sua integração.
+                    </p>
+                    <button class="btn btn-primary btn-lg" onclick="window.close()" style="width: 100%;">
+                        Fechar
+                    </button>
+                </div>
+            `;
+            document.body.appendChild(modalSucesso);
+            
+            setTimeout(() => {
+                window.close();
+            }, 5000);
+        });
+
+        // INICIALIZAR
+        window.addEventListener('load', () => {
+            verificarLinkCadastro();
+            init();
+        });
+
+        // FECHAR MODAL AO CLICAR FORA
+        document.addEventListener('click', (e) => {
+            if (e.target.classList.contains('modal')) {
+                e.target.classList.remove('active');
+                document.body.style.overflow = 'auto';
+            }
+        });
+
+        // IMPORTAÇÃO CSV
+        function importarColaboradores(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const text = e.target.result;
+                const lines = text.split('\n');
+                const headers = lines[0].split(',').map(h => h.trim());
+                
+                let importados = 0;
+                for (let i = 1; i < lines.length; i++) {
+                    if (!lines[i].trim()) continue;
+                    
+                    const values = lines[i].split(',').map(v => v.trim());
+                    const colaborador = {
+                        id: 'colab_' + Date.now() + '_' + i,
+                        nome: values[0] || '',
+                        cargo: values[1] || '',
+                        status: values[2] || 'Ativo',
+                        loja: values[3] || '',
+                        admissao: values[4] || '',
+                        desligamento: values[5] || null,
+                        lider: values[6] || '',
+                        regime: values[7] || 'CLT',
+                        email: values[8] || '',
+                        telefone: values[9] || '',
+                        avaliacao: '',
+                        responsograma: '',
+                        perfilComportamental: ''
+                    };
+                    
+                    if (colaborador.nome && colaborador.cargo) {
+                        colaboradores.push(colaborador);
+                        importados++;
+                    }
+                }
+                
+                saveData();
+                renderColaboradores();
+                renderDashboard();
+                updateNavBadges();
+                showToast('success', 'Importação Concluída', `${importados} colaboradores importados com sucesso!`);
+            };
+            reader.readAsText(file);
+            event.target.value = '';
+        }
+
+        function importarCandidatos(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const text = e.target.result;
+                    const lines = text.split('\n').filter(line => line.trim());
+                    
+                    if (lines.length < 2) {
+                        showToast('error', 'Erro na Importação', 'O arquivo CSV está vazio ou tem menos de 2 linhas.');
+                        return;
+                    }
+                    
+                    const primeiraLinha = lines[0].split(',').map(h => h.trim().toLowerCase());
+                    
+                    console.log('Headers encontrados:', primeiraLinha);
+                    
+                    let importados = 0;
+                    let erros = 0;
+                    
+                    // Processar cada linha (pular o header)
+                    for (let i = 1; i < lines.length; i++) {
+                        if (!lines[i].trim()) continue;
+                        
+                        try {
+                            const values = lines[i].split(',').map(v => v.trim());
+                            
+                            console.log(`Linha ${i}:`, values);
+                            
+                            const candidato = {
+                                id: 'cand_' + Date.now() + '_' + i,
+                                nome: values[0] || '',
+                                dataNascimento: values[1] || '',
+                                sexo: values[2] || '',
+                                telefone: values[3] || '',
+                                estadoCivil: values[4] || '',
+                                cidade: values[5] || '',
+                                bairro: values[6] || '',
+                                escolaridade: values[7] || '',
+                                comoSoube: values[8] || '',
+                                cidadeCandidatura: values[9] || '',
+                                disponibilidade: values[10] || '',
+                                experienciaVendas: values[11] || '',
+                                tempoExperiencia: values[12] || '',
+                                porqueGardeni: values[13] || '',
+                                curriculoLink: values[14] || '',
+                                vaga: 'Vendedor(a)', // Vaga padrão
+                                fase: 'triagem',
+                                data: new Date().toISOString().split('T')[0],
+                                observacoes: '',
+                                email: '' // Pode ser preenchido posteriormente
+                            };
+                            
+                            if (candidato.nome) {
+                                processosSeletivos.push(candidato);
+                                importados++;
+                                console.log('Candidato importado:', candidato.nome);
+                            } else {
+                                console.warn('Linha ignorada (falta nome):', values);
+                                erros++;
+                            }
+                        } catch (lineError) {
+                            console.error('Erro ao processar linha', i, ':', lineError);
+                            erros++;
+                        }
+                    }
+                    
+                    console.log(`Importação concluída: ${importados} sucesso, ${erros} erros`);
+                    
+                    saveData();
+                    renderRecrutamento();
+                    renderDashboard();
+                    updateNavBadges();
+                    
+                    if (importados > 0) {
+                        let mensagem = `${importados} candidato${importados > 1 ? 's' : ''} importado${importados > 1 ? 's' : ''} com sucesso!`;
+                        if (erros > 0) {
+                            mensagem += ` (${erros} linha${erros > 1 ? 's' : ''} com erro)`;
+                        }
+                        showToast('success', 'Importação Concluída', mensagem);
+                    } else {
+                        showToast('error', 'Nenhum Candidato Importado', `Verifique o formato do arquivo. ${erros} linha${erros > 1 ? 's' : ''} com erro.`);
+                    }
+                } catch (error) {
+                    console.error('Erro geral na importação:', error);
+                    showToast('error', 'Erro na Importação', 'Erro ao processar arquivo: ' + error.message);
+                }
+            };
+            
+            reader.onerror = function() {
+                showToast('error', 'Erro ao Ler Arquivo', 'Não foi possível ler o arquivo selecionado.');
+            };
+            
+            reader.readAsText(file, 'UTF-8');
+            event.target.value = '';
+        }
+
+        function baixarModeloCSV() {
+            const colaboradoresCSV = 'nome,cargo,status,loja,admissao,desligamento,lider,regime,email,telefone\nJoão Silva,Vendedor,Ativo,Imperatriz/MA,2024-01-15,,Maria Santos,CLT,joao@email.com,(11) 99999-0001\n';
+            const candidatosCSV = 'nome_completo,data_nascimento,sexo,telefone,estado_civil,cidade,bairro,escolaridade,como_soube,cidade_candidatura,disponibilidade,experiencia_vendas,tempo_experiencia,porque_gardeni,curriculo_link\nJoão Silva Santos,15/05/1995,Masculino,(99) 98877-6655,Solteiro,Imperatriz,Centro,Ensino Superior Completo,Instagram,Imperatriz/MA,Sim,Sim,3 anos,Porque admiro a empresa e quero crescer profissionalmente,https://drive.google.com/...\n';
+            
+            const blob1 = new Blob([colaboradoresCSV], { type: 'text/csv;charset=utf-8' });
+            const blob2 = new Blob([candidatosCSV], { type: 'text/csv;charset=utf-8' });
+            
+            const url1 = URL.createObjectURL(blob1);
+            const url2 = URL.createObjectURL(blob2);
+            
+            const link1 = document.createElement('a');
+            link1.href = url1;
+            link1.download = 'modelo_colaboradores.csv';
+            link1.click();
+            
+            setTimeout(() => {
+                const link2 = document.createElement('a');
+                link2.href = url2;
+                link2.download = 'modelo_candidatos_gardeni.csv';
+                link2.click();
+                
+                URL.revokeObjectURL(url1);
+                URL.revokeObjectURL(url2);
+            }, 500);
+            
+            showToast('success', 'Modelos Baixados', 'Arquivos CSV de exemplo foram baixados!');
+        }
+
+        // CÁLCULO DE TURNOVER
+        function calcularTurnover() {
+            const mesesPeriodo = parseInt(document.getElementById('turnoverPeriodo')?.value || 12);
+            const dataCorte = new Date();
+            dataCorte.setMonth(dataCorte.getMonth() - mesesPeriodo);
+            
+            // Calcular admissões no período
+            const admissoes = colaboradores.filter(c => {
+                const dataAdmissao = new Date(c.admissao);
+                return dataAdmissao >= dataCorte;
+            }).length;
+            
+            // Calcular desligamentos no período
+            const desligamentos = colaboradores.filter(c => {
+                if (!c.desligamento) return false;
+                const dataDesligamento = new Date(c.desligamento);
+                return dataDesligamento >= dataCorte;
+            }).length;
+            
+            // Headcount atual (apenas ativos)
+            const headcountAtual = colaboradores.filter(c => c.status === 'Ativo').length;
+            
+            // Calcular turnover: ((admissões + desligamentos) / 2) / headcount médio * 100
+            const headcountMedio = headcountAtual + (desligamentos / 2);
+            const turnoverGeral = headcountMedio > 0 ? 
+                (((admissoes + desligamentos) / 2) / headcountMedio * 100).toFixed(1) : 0;
+            
+            // Atualizar cards
+            document.getElementById('turnoverGeral').textContent = turnoverGeral + '%';
+            document.getElementById('totalAdmissoes').textContent = admissoes;
+            document.getElementById('totalDesligamentos').textContent = desligamentos;
+            document.getElementById('headcountAtual').textContent = headcountAtual;
+            
+            // Calcular por loja
+            const lojas = [...new Set(colaboradores.map(c => c.loja))];
+            const turnoverPorLoja = lojas.map(loja => {
+                const colabsLoja = colaboradores.filter(c => c.loja === loja);
+                const admissoesLoja = colabsLoja.filter(c => {
+                    const dataAdmissao = new Date(c.admissao);
+                    return dataAdmissao >= dataCorte;
+                }).length;
+                
+                const desligamentosLoja = colabsLoja.filter(c => {
+                    if (!c.desligamento) return false;
+                    const dataDesligamento = new Date(c.desligamento);
+                    return dataDesligamento >= dataCorte;
+                }).length;
+                
+                const headcountLoja = colabsLoja.filter(c => c.status === 'Ativo').length;
+                const headcountMedioLoja = headcountLoja + (desligamentosLoja / 2);
+                const turnoverLoja = headcountMedioLoja > 0 ? 
+                    (((admissoesLoja + desligamentosLoja) / 2) / headcountMedioLoja * 100).toFixed(1) : 0;
+                
+                return {
+                    loja,
+                    headcount: headcountLoja,
+                    admissoes: admissoesLoja,
+                    desligamentos: desligamentosLoja,
+                    turnover: turnoverLoja
+                };
+            });
+            
+            // Renderizar tabela de turnover por loja
+            const tbody = document.getElementById('turnoverTableBody');
+            if (turnoverPorLoja.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="6">
+                            <div class="table-empty">
+                                <div class="table-empty-icon">📊</div>
+                                <div class="table-empty-text">Nenhum dado disponível</div>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            } else {
+                tbody.innerHTML = turnoverPorLoja.map(t => {
+                    let statusBadge = 'badge-success';
+                    let statusText = '✅ Saudável';
+                    
+                    if (t.turnover > 15) {
+                        statusBadge = 'badge-danger';
+                        statusText = '⚠️ Alto';
+                    } else if (t.turnover > 10) {
+                        statusBadge = 'badge-warning';
+                        statusText = '⚡ Atenção';
+                    }
+                    
+                    return `
+                        <tr>
+                            <td><strong>${t.loja}</strong></td>
+                            <td>${t.headcount}</td>
+                            <td>${t.admissoes}</td>
+                            <td>${t.desligamentos}</td>
+                            <td><strong>${t.turnover}%</strong></td>
+                            <td><span class="badge ${statusBadge}">${statusText}</span></td>
+                        </tr>
+                    `;
+                }).join('');
+            }
+            
+            // Renderizar desligamentos recentes
+            const desligamentosRecentes = colaboradores
+                .filter(c => c.desligamento)
+                .sort((a, b) => new Date(b.desligamento) - new Date(a.desligamento))
+                .slice(0, 10);
+            
+            const desligamentosBody = document.getElementById('desligamentosTableBody');
+            if (desligamentosRecentes.length === 0) {
+                desligamentosBody.innerHTML = `
+                    <tr>
+                        <td colspan="6">
+                            <div class="table-empty">
+                                <div class="table-empty-icon">📋</div>
+                                <div class="table-empty-text">Nenhum desligamento registrado</div>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            } else {
+                desligamentosBody.innerHTML = desligamentosRecentes.map(c => {
+                    const dataAdmissao = new Date(c.admissao);
+                    const dataDesligamento = new Date(c.desligamento);
+                    const diasNaEmpresa = Math.floor((dataDesligamento - dataAdmissao) / (1000 * 60 * 60 * 24));
+                    const meses = Math.floor(diasNaEmpresa / 30);
+                    const anos = Math.floor(meses / 12);
+                    
+                    let tempoEmpresa = '';
+                    if (anos > 0) {
+                        tempoEmpresa = `${anos} ano${anos > 1 ? 's' : ''}`;
+                        if (meses % 12 > 0) tempoEmpresa += ` e ${meses % 12} mês${meses % 12 > 1 ? 'es' : ''}`;
+                    } else {
+                        tempoEmpresa = `${meses} mês${meses > 1 ? 'es' : ''}`;
+                    }
+                    
+                    return `
+                        <tr>
+                            <td><strong>${c.nome}</strong></td>
+                            <td>${c.cargo}</td>
+                            <td>${c.loja}</td>
+                            <td>${formatDate(c.admissao)}</td>
+                            <td>${formatDate(c.desligamento)}</td>
+                            <td>${tempoEmpresa}</td>
+                        </tr>
+                    `;
+                }).join('');
+            }
+        }
+    </script>
+</body>
+</html>
