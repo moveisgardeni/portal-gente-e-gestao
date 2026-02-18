@@ -1,13 +1,13 @@
 const SUPABASE_URL = "https://fvtpymhcichujgintauy.supabase.co";
 const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZ2dHB5bWhjaWNodWpnaW50YXV5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE0NDM4ODQsImV4cCI6MjA4NzAxOTg4NH0.F61bcqnLzgkgKzxTYir8_1UVvjkLDCaVBcgmM5ONAfw";
 
-const supabase = window.supabase.createClient(
+const client = window.supabase.createClient(
   SUPABASE_URL,
   SUPABASE_ANON_KEY
 );
 
 async function testeConexao() {
-  const { data, error } = await supabase
+  const { data, error } = await client
     .from("employees")
     .select("*");
 
